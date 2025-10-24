@@ -4,12 +4,13 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:PPApp"
-    xmlns:view="clr-namespace:PPApp.View"
+    xmlns:View="clr-namespace:PPApp.View"
+
     Title="PPApp">
 
     <ShellContent
         Title="Home"
-        ContentTemplate="{DataTemplate view:AllRecipesPage}"
+        ContentTemplate="{DataTemplate View:AllRecipesPage}"
         Route="AllRecipesPage" /> 
         <!-- Route is the name of the page and content template is the page type-->
 
