@@ -60,8 +60,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-  <Page Include="View\SearchPage.xaml" />
-</ItemGroup>
+		<Page Include="View\AllRecipesPage.xaml" />
+  		<Page Include="View\SearchPage.xaml" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />

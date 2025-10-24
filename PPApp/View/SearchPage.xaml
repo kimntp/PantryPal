@@ -11,7 +11,7 @@
         </ListView.Header>
         <ListView.ItemTemplate>
             <DataTemplate x:DataType="Model:Recipe">
-                <TextCell Text="{Binding name}" Detail="{Binding url}" />
+                <TextCell Text="{Binding name}" Tapped="OnRecipe_Tapped"/>
             </DataTemplate>
 
             </ListView.ItemTemplate>
