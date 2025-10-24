@@ -1,4 +1,4 @@
-﻿using PPApp.View;
+﻿
 
 namespace PPApp;
 
@@ -8,7 +8,7 @@ public partial class AppShell : Shell
 	{
 		InitializeComponent();
 		//must include pages here in in order to navigate to them
-		Routing.RegisterRoute(nameof(AllRecipesPage), typeof(AllRecipesPage));
-		Routing.RegisterRoute(nameof(SearchPage), typeof(SearchPage));
+		Routing.RegisterRoute(nameof(View.AllRecipesPage), typeof(View.AllRecipesPage));
+		Routing.RegisterRoute(nameof(View.SearchPage), typeof(View.SearchPage));
 	}
 }
