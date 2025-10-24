@@ -26,5 +26,15 @@ namespace PPApp.View
                 await DisplayAlert("Error", $"Failed to load recipes: {ex.Message}", "OK");
             }
         }
+       private async void OnRecipe_Tapped(object sender, EventArgs e)
+        {
+            if (sender is TextCell cell && cell.BindingContext is Recipe recipe)
+            {
+                // Join ingredients into a single string
+              string ingredientsList = string.Join(", ", recipe.ingredients);
+                // Show an alert with the list of ingredients
+                await DisplayAlert(recipe.name, $"Ingredients:\n{ingredientsList}", "OK");
+            }
+        }
     }
 }   
