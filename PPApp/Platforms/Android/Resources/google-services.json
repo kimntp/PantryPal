@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "491029656939",
+    "project_id": "pantry-pal-23f98",
+    "storage_bucket": "pantry-pal-23f98.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:491029656939:android:fff5b2478eaec0e731082e",
+        "android_client_info": {
+          "package_name": "Pantry.Pal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZIaCxl5Np9aFzpTuDPQAaCUEf1wJu31o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

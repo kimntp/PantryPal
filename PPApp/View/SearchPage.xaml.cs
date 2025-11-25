@@ -1,40 +1,81 @@
-using System.Text.Json;
 using PPApp.Model;
+using PPApp.Service;
 
-namespace PPApp.View
+namespace PPApp.View;
+
+public partial class SearchPage : ContentPage
 {
-    public partial class SearchPage : ContentPage
-    {
-        public SearchPage()
-        {
-            InitializeComponent();
-            LoadRecipesAsync();
-        }
+    private readonly FirebaseUserDatabaseService _recipeService = new FirebaseUserDatabaseService();
+    private readonly IFirebaseAuthService _auth;
+    private List<Recipe> _allRecipes = new List<Recipe>();
 
-        private async void LoadRecipesAsync()
+    public SearchPage(IFirebaseAuthService auth)
+    {
+        InitializeComponent();
+         _auth = auth;
+        LoadRecipesAsync();
+    }
+
+    // Load all recipes from Firebase
+    private async void LoadRecipesAsync()
+    {
+        try
         {
-            try
+    
+            var recipeList = await _recipeService.GetAllRecipes();
+
+            // Assign recipeID from index
+            int index = 0;
+            foreach (var item in recipeList)
             {
-                using var stream = await FileSystem.OpenAppPackageFileAsync("dataset.json");
-                using var reader = new StreamReader(stream);
-                var json = await reader.ReadToEndAsync();
-                var recipes = JsonSerializer.Deserialize<List<Recipe>>(json);
-                listRecipes.ItemsSource = recipes;
+                item.recipeID = index.ToString();
+                index++;
             }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Error", $"Failed to load recipes: {ex.Message}", "OK");
-            }
+
+            // Now bind to UI
+            listRecipes.ItemsSource = recipeList;
+
+
         }
-       private async void OnRecipe_Tapped(object sender, EventArgs e)
+        catch (Exception ex)
         {
-            if (sender is TextCell cell && cell.BindingContext is Recipe recipe)
-            {
-                // Join ingredients into a single string
-              string ingredientsList = string.Join(", ", recipe.ingredients);
-                // Show an alert with the list of ingredients
-                await DisplayAlert(recipe.name, $"Ingredients:\n{ingredientsList}", "OK");
-            }
+            await DisplayAlert("Error", $"Failed to load recipes: {ex.Message}", "OK");
         }
     }
-}   
+
+    // Handle tapping a recipe
+    private async void OnRecipe_Tapped(object sender, ItemTappedEventArgs e)
+    {
+        if (e.Item is Recipe recipe)
+        {
+            await Navigation.PushModalAsync(new SaveRecipePopup(recipe, _auth));
+
+        }
+        // Deselect item
+        listRecipes.SelectedItem = null;
+    }
+
+
+    // Optional: search filter
+    private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(e.NewTextValue))
+        {
+            listRecipes.ItemsSource = _allRecipes;
+        }
+        else
+        {
+            listRecipes.ItemsSource = _allRecipes
+                .Where(r => r.name.Contains(e.NewTextValue, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+    }
+
+    // Optional: go to profile
+    /*
+    private async void BtnUser_Clicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync(nameof(ProfilePage));
+    }
+    */
+}

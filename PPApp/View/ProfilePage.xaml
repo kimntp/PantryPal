@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:Model="clr-namespace:PPApp.Model"
+             x:Class="PPApp.View.ProfilePage"
+             Title="Profile">
+
+<VerticalStackLayout Padding="20" Spacing="10">
+    <Label Text="User Profile" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" />
+    <Label x:Name="displayNameLabel" Text="Name: -" />
+    <Label x:Name="emailLabel" Text="Email: -" />
+    <Button x:Name="btnSignOut" Text="Sign Out" Clicked="OnSignOutClicked" />
+
+    <ListView x:Name="listRecipes" BackgroundColor="Transparent">
+        <ListView.ItemTemplate>
+            <DataTemplate x:DataType="Model:Recipe">
+                <TextCell Text="{Binding name}" />
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
+</VerticalStackLayout>
+
+
+</ContentPage>

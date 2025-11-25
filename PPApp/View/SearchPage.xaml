@@ -1,20 +1,38 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                xmlns:Model="clr-namespace:PPApp.Model"
+             xmlns:Model="clr-namespace:PPApp.Model"
              x:Class="PPApp.View.SearchPage"
-                Title="Pantry Pal">
+             Title="Pantry Pal">
 
-    <ListView x:Name="listRecipes" BackgroundColor="Transparent">
-        <ListView.Header>
-            <SearchBar Placeholder="Search Recipes"/>
-        </ListView.Header>
-        <ListView.ItemTemplate>
-            <DataTemplate x:DataType="Model:Recipe">
-                <TextCell Text="{Binding name}" Tapped="OnRecipe_Tapped"/>
-            </DataTemplate>
+    <VerticalStackLayout Padding="10" Spacing="10">
 
+        <!-- Toolbar/Profile button can be uncommented later -->
+        <!--
+        <ToolbarItem Text="Profile"
+                     IconImageSource="profile.png"
+                     Order="Primary"
+                     Priority="0"
+                     Clicked="BtnUser_Clicked" />
+        -->
+
+        <!-- Search Bar -->
+        <SearchBar x:Name="searchBar"
+                   Placeholder="Search Recipes"
+                   TextChanged="OnSearchBarTextChanged" />
+
+        <!-- List of Recipes -->
+        <ListView x:Name="listRecipes"
+                  BackgroundColor="Transparent"
+                  ItemTapped="OnRecipe_Tapped"
+                  HasUnevenRows="True">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="Model:Recipe">
+                    <TextCell Text="{Binding name}"/>
+                </DataTemplate>
             </ListView.ItemTemplate>
-    </ListView>
+        </ListView>
+
+    </VerticalStackLayout>
 
 </ContentPage>
