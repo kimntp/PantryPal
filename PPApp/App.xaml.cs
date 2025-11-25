@@ -1,14 +1,20 @@
-﻿namespace PPApp;
+﻿using PPApp.Service;
+
+namespace PPApp;
 
 public partial class App : Application
 {
-	public App()
-	{
-		InitializeComponent();
-	}
+    private readonly IFirebaseAuthService _auth;
 
-	protected override Window CreateWindow(IActivationState? activationState)
-	{
-		return new Window(new AppShell());
-	}
+    public App(IFirebaseAuthService auth)
+    {
+        InitializeComponent();
+        _auth = auth;
+    }
+
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        // Pass the auth service to AppShell
+        return new Window(new AppShell(_auth));
+    }
 }

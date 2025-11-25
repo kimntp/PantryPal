@@ -1,0 +1,24 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PPApp.View.SaveRecipePopup">
+
+    <VerticalStackLayout Padding="20" Spacing="10">
+
+        <Label x:Name="recipeNameLabel"
+               FontSize="22"
+               FontAttributes="Bold" />
+
+        <Label Text="Ingredients:" FontAttributes="Bold" />
+        <Label x:Name="ingredientsLabel" />
+        <Label Text="URL:" FontAttributes="Bold" />
+        <Label x:Name="urlLabel"
+               TextColor="Blue" />
+
+        <Button Text="Save Recipe"
+                Clicked="OnSaveClicked" />       
+
+
+        <Button Text="Close"
+                Clicked="OnCloseClicked" />
+    </VerticalStackLayout>
+</ContentPage>

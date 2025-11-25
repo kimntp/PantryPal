@@ -1,4 +1,5 @@
-[
+{
+"recipes": [ 
 {"name": "Butter bean & chorizo stew", "url": "https://www.bbcgoodfood.com/recipes/butter-bean-chorizo-stew", "ingredients": ["cooking chorizo", "chopped tomatoes", "drained butter beans", "pesto"]},
 {"name": "Spanish rice & prawn one-pot", "url": "https://www.bbcgoodfood.com/recipes/spanish-rice-prawn-one-pot", "ingredients": ["onion", "pepper", "chorizo", "garlic cloves", "olive oil", "easy cook basmati rice", "can chopped tomato", "raw, peeled prawns"]},
 {"name": "Tuna & sundried tomato pasta bake", "url": "https://www.bbcgoodfood.com/recipes/tuna-sundried-tomato-pasta-bake", "ingredients": ["dried rigatoni", "chopped tomatoes", "thyme sprigs", "double cream", "sundried tomatoes", "no-added-salt sweetcorn", "tuna", "cheddar", "parmesan"]},
@@ -103,3 +104,4 @@
 {"name": "Air fryer meatballs", "url": "https://www.bbcgoodfood.com/recipes/air-fryer-meatballs", "ingredients": ["good-quality sausages", "beef mince", "onion", "parmesan", "fresh breadcrumbs", "parsley", "egg"]},
 {"name": "Quick pizza dough", "url": "https://www.bbcgoodfood.com/recipes/quick-pizza-dough-2", "ingredients": ["strong white bread flour", "fast-action dried yeast", "caster sugar", "pizza toppings"]}
 ]
+}

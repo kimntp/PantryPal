@@ -6,7 +6,8 @@
 
     <VerticalStackLayout Spacing="5">
         <Image Source="pplogo.png"/>
-        <Button x:Name="btnSearch" Clicked="BtnSearch_Clicked" Text="Search"> </Button>
+        <!-- <Button x:Name="btnRegister" Clicked="BtnRegister_Clicked" Text="Register New User"> </Button>
+        <Button x:Name="btnLogin" Clicked="BtnLogin_Clicked" Text="Login"> </Button> -->
     </VerticalStackLayout>
 
 </ContentPage>
