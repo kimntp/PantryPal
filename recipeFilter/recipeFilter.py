@@ -1,58 +1,40 @@
 import json
 
 # IMPORTANT: ensure file paths are correct for your own device
-RECIPES_FILE_PATH = "/Users/gh3work/code_projects/PantryPal/recipeFilter/all_recipes.json"
+RECIPES_FILE_PATH = "/Users/gh3work/code_projects/PantryPal/recipeFilter/cleanedRecipes.json"
 INGREDIENTS_FILE_PATH = "/Users/gh3work/code_projects/PantryPal/ingredientGetter/ingredients.json"
-OUTPUT_FILE_PATH = "/Users/gh3work/code_projects/PantryPal/recipeFilter"
+OUTPUT_FILE_PATH = "/Users/gh3work/code_projects/PantryPal/recipeFilter/filteredDataset.json"
 
-vegetarian_recipes = []
-gluten_free_recipes = []
-vegetarian_and_gluten_free = []
+recipe_list = {}
 
-recipe_file = open(RECIPES_FILE_PATH, "r")
-recipe_database = json.load(recipe_file)
-ingredient_file = open(INGREDIENTS_FILE_PATH, "r")
-ingredient_database = json.load(ingredient_file)
+# loads relevant JSONs
+with open(RECIPES_FILE_PATH, "r") as recipe_file:
+    recipes = json.load(recipe_file)
 
-for recipe in recipe_database:
-    recipe_ingredients = recipe["ingredients"]
-    is_vegetarian = vegetarian(recipe_ingredients)
-    is_gluten_free = gluten_free(recipe_ingredients)
+with open(INGREDIENTS_FILE_PATH,"r") as ingredient_file:
+    ingredients = json.load(ingredient_file)
+         
+# builds dictionary in the form
+# { ingredient_name : {is_meat: ..., has_gluten: ..., recipes: [ ... ]}
+for ingredient_obj in ingredients:
+    ingredient_name = ingredient_obj["ingredient"]
+    is_meat = ingredient_obj["is_meat"]
+    has_gluten = ingredient_obj["has_gluten"]
 
-    if is_vegetarian == True:
-        vegetarian_recipes.append(recipe)
+    recipes_containing_ingredient = []
     
-    if is_gluten_free == True:
-        gluten_free_recipes.append(recipe)
-    
-    if is_vegetarian == True and is_gluten_free == True:
-        vegetarian_and_gluten_free.append(recipe)
+    for recipe in recipes:
+        # recipe["ingredients"] is a list of strings
+        if ingredient_name in recipe["ingredients"]:
+            recipes_containing_ingredient.append(recipe)
 
-if recipe_file in locals() and not recipe_file.closed:
-        recipe_file.close()
-if ingredient_file in locals() and not ingredient_file.closed:
-        ingredient_file.close()
+    # formats and adds ingredient and relevant info to "recipe_list"
+    recipe_list[ingredient_name] = {
+        "is_meat": is_meat,
+        "has_gluten": has_gluten,
+        "recipes": recipes_containing_ingredient
+    }
 
-def vegetarian(ingredient_list):
-    for ingredient in ingredient_list:
-        if ingredient_database[ingredient]["is_meat"] == True:
-            return False
-    return True
-
-def gluten_free(ingredient_list):
-    for ingredient in ingredient_list:
-        if ingredient_database[ingredient]["has_gluten"] == True:
-            return False
-    return True
-                                        
-# dumps "vegetarian_recipes" list to a new vegetarian database called "vegetarian_recipes.json"
-with open(OUTPUT_FILE_PATH + "/vegetarian_recipes.json", "w") as vegetarian_file:
-    json.dump(vegetarian_recipes, vegetarian_file, indent=4)
-
-# dumps "gluten_free_recipes" list to a new gluten-free database called "gluten_free_recipes.json"
-with open(OUTPUT_FILE_PATH + "/gluten_free_recipes.json", "w") as gluten_free_file:
-    json.dump(gluten_free_recipes, gluten_free_file, indent=4)
-
-# dumps "vegetarian_and_gluten_free" to a new database called "vegetarian_and_gluten_free_recipes.json"
-with open(OUTPUT_FILE_PATH + "/vegetarian_and_gluten_free_recipes.json", "w") as vgf_file:
-    json.dump(vegetarian_and_gluten_free, vgf_file, indent=4)
+# dumps "recipe_list" to a tagged recipe database called "ingredients.json"
+with open(OUTPUT_FILE_PATH, "w") as output_file:
+    json.dump(recipe_list, output_file, indent=4)
