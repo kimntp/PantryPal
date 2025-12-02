@@ -1,6 +1,7 @@
 namespace PPApp.Model
 {
-    public class Ingredient
+    // value for each ingredient key in the index
+    public class IngredientIndexEntry
     {
         public required bool IsMeat { get; set; }
         public required bool HasGluten { get; set; }

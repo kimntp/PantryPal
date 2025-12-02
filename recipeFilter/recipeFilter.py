@@ -1,9 +1,8 @@
 import json
 
-# IMPORTANT: ensure file paths are correct for your own device
-RECIPES_FILE_PATH = "/Users/gh3work/code_projects/PantryPal/recipeFilter/cleanedRecipes.json"
-INGREDIENTS_FILE_PATH = "/Users/gh3work/code_projects/PantryPal/ingredientGetter/ingredients.json"
-OUTPUT_FILE_PATH = "/Users/gh3work/code_projects/PantryPal/recipeFilter/filteredDataset.json"
+RECIPES_FILE_PATH = "PPApp/Resources/Raw/cleanedDataset.json"
+INGREDIENTS_FILE_PATH = "PPApp/Resources/Raw/ingredients.json"
+OUTPUT_FILE_PATH = "PPApp/Resources/Raw/ingredientIndex.json"
 
 recipe_list = {}
 
@@ -35,6 +34,6 @@ for ingredient_obj in ingredients:
         "recipes": recipes_containing_ingredient
     }
 
-# dumps "recipe_list" to a tagged recipe database called "ingredients.json"
+# dumps "recipe_list" to a tagged recipe database called "ingredientIndex.json"
 with open(OUTPUT_FILE_PATH, "w") as output_file:
     json.dump(recipe_list, output_file, indent=4)

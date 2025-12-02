@@ -9,14 +9,14 @@ namespace PPApp.View
     {
         private readonly Recipe _recipe;
         private readonly IFirebaseAuthService _authService;
-        private readonly FirebaseUserDatabaseService _userDb;
+        private readonly IFirebaseUserDataService _userDb;
 
         public SaveRecipePopup(Recipe recipe, IFirebaseAuthService auth)
         {
             InitializeComponent();
             _recipe = recipe;
             _authService = auth;
-            _userDb = new FirebaseUserDatabaseService();
+            _userDb = new IFirebaseUserDataService();
 
             LoadRecipe();
         }

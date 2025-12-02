@@ -1,12 +1,9 @@
 import json
 
-# IMPORTANT: replace the file paths below with the appropriate locations on your own computer
-# if you want to run the program on your own computer 
-
 #input file
-RECIPES_FILE_PATH = "/Users/gh3work/code_projects/PantryPal/recipeFilter/all_recipes.json"
+RECIPES_FILE_PATH = "PPApp/Resources/Raw/cleanedDataset.json"
 #output_file
-INGREDIENTS_FILE_PATH = "/Users/gh3work/code_projects/PantryPal/ingredientGetter/ingredients.json"
+INGREDIENTS_FILE_PATH = "PPApp/Resources/Raw/ingredients.json"
 
 ingredients_list = []
 staged_ingredients = []
