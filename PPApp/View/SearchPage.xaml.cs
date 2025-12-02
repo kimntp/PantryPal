@@ -1,41 +1,31 @@
+using System.Text.Json;
 using PPApp.Model;
-using PPApp.Service;
 
 namespace PPApp.View;
 
 public partial class SearchPage : ContentPage
 {
-    private readonly FirebaseUserDatabaseService _recipeService = new FirebaseUserDatabaseService();
-    private readonly IFirebaseAuthService _auth;
-    private List<Recipe> _allRecipes = new List<Recipe>();
+    private List<Recipe> _allRecipes = new();
 
-    public SearchPage(IFirebaseAuthService auth)
+    public SearchPage()
     {
         InitializeComponent();
-         _auth = auth;
         LoadRecipesAsync();
     }
 
-    // Load all recipes from Firebase
+    // load recipes from bundled JSON file
     private async void LoadRecipesAsync()
     {
         try
         {
-    
-            var recipeList = await _recipeService.GetAllRecipes();
+            using var stream = await FileSystem.OpenAppPackageFileAsync("recipes.json");
+            using var reader = new StreamReader(stream);
+            var json = await reader.ReadToEndAsync();
 
-            // Assign recipeID from index
-            int index = 0;
-            foreach (var item in recipeList)
-            {
-                item.recipeID = index.ToString();
-                index++;
-            }
-
-            // Now bind to UI
-            listRecipes.ItemsSource = recipeList;
-
-
+            _allRecipes = JsonSerializer.Deserialize<List<Recipe>>(json)
+                          ?? new List<Recipe>();
+                
+            RecipesCollectionView.ItemsSource = ProjectForView(_allRecipes);
         }
         catch (Exception ex)
         {
@@ -43,39 +33,85 @@ public partial class SearchPage : ContentPage
         }
     }
 
-    // Handle tapping a recipe
-    private async void OnRecipe_Tapped(object sender, ItemTappedEventArgs e)
-    {
-        if (e.Item is Recipe recipe)
-        {
-            await Navigation.PushModalAsync(new SaveRecipePopup(recipe, _auth));
-
-        }
-        // Deselect item
-        listRecipes.SelectedItem = null;
-    }
-
-
-    // Optional: search filter
+    // Event handler for search bar text changes
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(e.NewTextValue))
+        var query = e.NewTextValue;
+
+        if (string.IsNullOrWhiteSpace(query))
         {
-            listRecipes.ItemsSource = _allRecipes;
+            // show all recipes when search is empty
+            RecipesCollectionView.ItemsSource = ProjectForView(_allRecipes);
+            return;
         }
-        else
+
+        var tokens = query
+            .Split(new[] { ',', ','}, StringSplitOptions.RemoveEmptyEntries)
+            .Select(t => t.Trim().ToLowerInvariant())
+            .Where(t => t.Length > 0)
+            .Distinct()
+            .ToList();
+
+        if (tokens.Count == 0)
         {
-            listRecipes.ItemsSource = _allRecipes
-                .Where(r => r.name.Contains(e.NewTextValue, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            RecipesCollectionView.ItemsSource = ProjectForView(_allRecipes);
+            return;
         }
+
+        var ranked = _allRecipes
+            .Select(r => new
+            {
+                Recipe = r,
+                Score = ComputeIngredientScore(r, tokens)
+            })
+            .Where(x => x.Score > 0)
+            .OrderByDescending(x => x.Score)
+            .Select(x => x.Recipe)
+            .ToList();
+
+        RecipesCollectionView.ItemsSource = ProjectForView(ranked);
+    }
+    
+
+    // fuzzy-ish score: how many tokens match any ingredient string
+    private int ComputeIngredientScore(Recipe recipe, List<string> tokens)
+    {
+        if (recipe.Ingredients == null || recipe.Ingredients.Count == 0)
+            return 0;
+
+        var normalizedIngredients = recipe.Ingredients
+            .Where(i => !string.IsNullOrWhiteSpace(i))
+            .Select(i => i.ToLowerInvariant())
+            .ToList();
+
+        int score = 0;
+
+        foreach (var token in tokens)
+        {
+            bool tokenMatches = normalizedIngredients.Any(ing =>
+                ing.Contains(token) || token.Contains(ing));
+
+            if (tokenMatches)
+            {
+                score++;
+            }
+        }
+        return score;
     }
 
-    // Optional: go to profile
-    /*
-    private async void BtnUser_Clicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync(nameof(ProfilePage));
+// Helper: project recipes into objects with an IngredientsString for display
+private List<object> ProjectForView(List<Recipe> recipes)
+{
+    return recipes
+        .Select(r => new
+        {
+            r.Name,
+            r.Url,
+            IngredientsString = r.Ingredients == null
+                ? string.Empty
+                : string.Join(", ", r.Ingredients)
+        })
+        .Cast<object>()
+        .ToList();
     }
-    */
 }

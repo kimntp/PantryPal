@@ -23,9 +23,9 @@ namespace PPApp.View
 
         private void LoadRecipe()
         {
-            recipeNameLabel.Text = _recipe.name;
-            ingredientsLabel.Text = string.Join(", ", _recipe.ingredients ?? new List<string>());
-            urlLabel.Text = _recipe.url;
+            recipeNameLabel.Text = _recipe.Name;
+            ingredientsLabel.Text = string.Join(", ", _recipe.Ingredients ?? new List<string>());
+            urlLabel.Text = _recipe.Url;
         }
 
 
@@ -41,7 +41,7 @@ namespace PPApp.View
 
             await _userDb.SaveRecipeAsync(user.Uid, _recipe);
 
-            await DisplayAlert("Saved", $"{_recipe.name} has been saved!", "OK");
+            await DisplayAlert("Saved", $"{_recipe.Name} has been saved!", "OK");
             await Navigation.PopModalAsync();
         }
 

@@ -16,23 +16,33 @@
                      Clicked="BtnUser_Clicked" />
         -->
 
+        <Label Text="What ingredients do you have?"
+            FontSize="18"
+            HorizontalOptions="Center" />
+
         <!-- Search Bar -->
         <SearchBar x:Name="searchBar"
-                   Placeholder="Search Recipes"
+                   Placeholder="e.g. chicken, tomato, rice"
                    TextChanged="OnSearchBarTextChanged" />
 
-        <!-- List of Recipes -->
-        <ListView x:Name="listRecipes"
-                  BackgroundColor="Transparent"
-                  ItemTapped="OnRecipe_Tapped"
-                  HasUnevenRows="True">
-            <ListView.ItemTemplate>
+        <!-- Most Similar Recipes Results -->
+        <CollectionView x:Name="RecipesCollectionView">
+            <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="Model:Recipe">
-                    <TextCell Text="{Binding name}"/>
+                    <Border Padding="10" Margin="0,5">
+                        <VerticalStackLayout>
+                            <Label Text ="{Binding Name}"
+                                FontAttributes="Bold"
+                                FontSize="16" />
+                            <Label Text="{Binding Url}"
+                                FontSize="12" />
+                            <Label Text="Binding IngredientsString}"
+                                FontSize="12"
+                                TextColor="Gray" />
+                        </VerticalStackLayout>
+                    </Border>
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </VerticalStackLayout>
-
 </ContentPage>
