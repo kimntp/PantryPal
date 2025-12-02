@@ -21,6 +21,7 @@ public partial class SearchPage : ContentPage
             await _indexService.InitializeAsync();
             _allRecipes = _indexService.GetAllRecipes();
             RecipesCollectionView.ItemsSource = _allRecipes;
+            RecipesCollectionView.SelectionChanged += OnRecipeSelected;
         }
         catch (Exception ex)
         {
@@ -35,13 +36,15 @@ public partial class SearchPage : ContentPage
         RecipesCollectionView.ItemsSource = results;
     }
 
-    private async void OnRecipe_Tapped(object sender, ItemTappedEventArgs e)
+    private async void OnRecipeSelected(object sender, SelectionChangedEventArgs e)
     {
-        if (e.Item is Recipe recipe)
+        if (e.CurrentSelection?.FirstOrDefault() is Recipe recipe)
         {
-            // For now just show name; later we integrate Firebase save here
             await DisplayAlert("Recipe Selected", recipe.Name, "OK");
+
+            //await Navigation.PushModalAsync(new SaveRecipePopup(recipe, _userDataService, _userId));
         }
-        RecipesCollectionView.SelectedItem = null;
+
+        ((CollectionView)sender).SelectedItem = null;
     }
 }

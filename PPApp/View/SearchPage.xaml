@@ -26,20 +26,33 @@
                    TextChanged="OnSearchBarTextChanged" />
 
         <!-- Most Similar Recipes Results -->
-        <CollectionView x:Name="RecipesCollectionView">
+        <CollectionView x:Name="RecipesCollectionView"
+                        SelectionMode="Single">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="Model:Recipe">
                     <Border Padding="10" Margin="0,5">
-                        <VerticalStackLayout>
-                            <Label Text ="{Binding Name}"
-                                FontAttributes="Bold"
-                                FontSize="16" />
-                            <Label Text="{Binding Url}"
-                                FontSize="12" />
-                            <Label Text="Binding IngredientsString}"
-                                FontSize="12"
-                                TextColor="Gray" />
-                        </VerticalStackLayout>
+                        <Grid ColumnDefinitions="120,*" ColumnSpacing="10">
+
+                            <!-- Recipe Image -->
+                            <Image Grid.Column="0"
+                                   Source="{Binding ImageUrl}"
+                                   HeightRequest="100"
+                                   WidthRequest="120"
+                                   Aspect="AspectFill" />
+
+                            <!-- Recipe Info -->
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="4">
+                                <Label Text="{Binding Name}"
+                                       FontAttributes="Bold"
+                                       FontSize="16" />
+                                <Label Text="{Binding Url}"
+                                       FontSize="12"
+                                       TextColor="Gray"
+                                       LineBreakMode="TailTruncation" />
+                                       
+                            </VerticalStackLayout>
+                        </Grid>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

@@ -1,3 +1,5 @@
+using PPApp.Model;
+
 namespace PPApp.Service
 {
     public interface IUserDataService

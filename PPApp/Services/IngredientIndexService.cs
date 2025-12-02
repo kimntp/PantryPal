@@ -27,7 +27,7 @@ namespace PPApp.Service
         {
             _allRecipes = _index.Values
                 .SelectMany(entry => entry.Recipes ?? new List<Recipe>())
-                .GroupBy(r => r.Url ?? r.Name)
+                .GroupBy(r => r.RecipeID)
                 .Select(g => g.First())
                 .ToList();
         }

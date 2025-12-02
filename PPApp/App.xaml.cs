@@ -8,6 +8,6 @@ public partial class App : Application
     {
         InitializeComponent();
 
-        Windows[0].Page = new SearchPage();
+        MainPage = new SearchPage();
     }
 }

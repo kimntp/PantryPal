@@ -1,6 +1,6 @@
 import json
 
-RECIPES_FILE_PATH = "PPApp/Resources/Raw/cleanedDataset.json"
+RECIPES_FILE_PATH = "PPApp/Resources/Raw/finalizedDataset.json"
 INGREDIENTS_FILE_PATH = "PPApp/Resources/Raw/ingredients.json"
 OUTPUT_FILE_PATH = "PPApp/Resources/Raw/ingredientIndex.json"
 
