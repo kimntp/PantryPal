@@ -1,5 +1,6 @@
 using PPApp.Model;
 using PPApp.Services;
+using System.Collections.ObjectModel;
 
 namespace PPApp.View;
 
@@ -8,14 +9,17 @@ public partial class AllRecipesPage : ContentPage
     private readonly FirebaseUserDatabaseService _indexService;
     private readonly IFirebaseAuthService _auth;
 
-    public List<Recipe> Recipes { get; set; } = new(); // Initialize to avoid null binding
+    // Use ObservableCollection for automatic UI updates
+    public ObservableCollection<Recipe> Recipes { get; set; } = new();
 
     public AllRecipesPage(IFirebaseAuthService auth, FirebaseUserDatabaseService indexService)
     {
         InitializeComponent();
         _auth = auth;
         _indexService = indexService;
-        BindingContext = this; // Set BindingContext for data binding
+
+        // Bind the CollectionView to the ObservableCollection
+        listRecipes.ItemsSource = Recipes;
     }
 
     protected override async void OnAppearing()
@@ -36,28 +40,35 @@ public partial class AllRecipesPage : ContentPage
                 return;
             }
 
-            // Assign temporary IDs if missing
+            // Clear previous items
+            Recipes.Clear();
+
+            // Assign IDs if missing and add to ObservableCollection
             for (int i = 0; i < recipeList.Count; i++)
             {
                 if (string.IsNullOrEmpty(recipeList[i].RecipeID))
                     recipeList[i].RecipeID = i.ToString();
-            }
 
-            Recipes = recipeList.ToList();
-            listRecipes.ItemsSource = Recipes; // Bind to CollectionView
+                Recipes.Add(recipeList[i]);
+            }
         }
         catch (Exception ex)
         {
             await DisplayAlert("Error", $"Failed to load recipes: {ex.Message}", "OK");
         }
     }
-
-    private async void OnRecipe_Selected(object sender, SelectionChangedEventArgs e)
+    private async void OnRecipe_Tapped(object sender, EventArgs e)
     {
-        if (e.CurrentSelection is Recipe recipe)
+        try
         {
-            await Navigation.PushModalAsync(new SaveRecipePopup(recipe, _auth));
-            ((CollectionView)sender).SelectedItem = null; // Deselect
+            if (sender is VisualElement ve && ve.BindingContext is Recipe recipe)
+            {
+                await Navigation.PushModalAsync(new SaveRecipePopup(recipe, _auth));
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"OnRecipe_Tapped error: {ex}");
         }
     }
 }

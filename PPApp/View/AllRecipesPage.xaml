@@ -6,34 +6,30 @@
              Title="Pantry Pal">
 
     <Grid Padding="10">
-
         <CollectionView x:Name="listRecipes"
-                        ItemsSource="{Binding Recipes}"
                         SelectionMode="Single"
-                        SelectionChanged="OnRecipe_Selected"
                         BackgroundColor="Transparent"
                         VerticalOptions="FillAndExpand">
-
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="Model:Recipe">
-                    <Frame Padding="10"
+                    <Frame Padding="15"
                            Margin="5"
                            CornerRadius="5"
-                           BackgroundColor="White"
+                           BackgroundColor="#FFB893B8"
                            HasShadow="True">
-                        <Label Text="{Binding Name}" 
+                           <Label Text="{Binding Name}" 
                                FontSize="16"
                                LineBreakMode="TailTruncation" />
+                           <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRecipe_Tapped" NumberOfTapsRequired="1" />
+                           </Frame.GestureRecognizers>
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical"
                                    ItemSpacing="5" />
             </CollectionView.ItemsLayout>
-
         </CollectionView>
-
     </Grid>
 </ContentPage>

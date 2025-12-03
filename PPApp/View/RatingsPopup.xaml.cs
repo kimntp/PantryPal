@@ -68,10 +68,9 @@ public partial class RatingsPopup : ContentPage
             Review = reviewText,
             Date = DateTime.Now,
             IsPublic = _isPublic,
-            UserName = user.DisplayName ?? "Anonymous"
+            UserName = user.DisplayName ?? "Anonymous",
+            UserId = user.Uid
         };
-
-        AppData.AddRating(rating);
 
         // Save rating to database under /userReviews/{uid}/{recipeId}/
         try

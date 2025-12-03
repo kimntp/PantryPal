@@ -5,6 +5,7 @@ using Firebase.Database.Query;
 using PPApp.Model;
 using Microsoft.Maui.Storage;
 using System.Text.Json;
+using System.Diagnostics;
 
 namespace PPApp.Services
 {
@@ -16,15 +17,15 @@ namespace PPApp.Services
         bool IsSignedIn { get; }
         Task<AppUser?> GetCurrentUser();
     }
-
     public class FirebaseAuthService : IFirebaseAuthService
     {
         private readonly FirebaseAuthClient _client;
         private readonly FirebaseClient _db;
 
+    
+
         public FirebaseAuthService()
         {
-            // Firebase Auth config
             var config = new FirebaseAuthConfig
             {
                 ApiKey = "AIzaSyDkGQiGvYKvInQUR5jxysX2cyOAji6TNeI",
@@ -37,29 +38,31 @@ namespace PPApp.Services
 
             _client = new FirebaseAuthClient(config);
 
-            // Realtime Database client with Auth token
             _db = new FirebaseClient(
                 "https://pantry-pal-23f98-default-rtdb.firebaseio.com/",
                 new FirebaseOptions
                 {
-                    AuthTokenAsyncFactory = async () => await SecureStorage.GetAsync("auth_token")
+                    // always return a fresh token
+                    AuthTokenAsyncFactory = async () =>
+                    {
+                        if (_client.User != null)
+                            return await _client.User.GetIdTokenAsync();
+                        return await SecureStorage.GetAsync("auth_token");
+                    }
                 });
         }
 
-        // -----------------------------
-        // LOGIN
-        // -----------------------------
         public async Task<AppUser?> SignIn(string email, string password)
         {
             try
             {
                 var result = await _client.SignInWithEmailAndPasswordAsync(email, password);
+
                 var token = await result.User.GetIdTokenAsync();
                 await SecureStorage.SetAsync("auth_token", token);
 
                 var profile = await GetUserFromDatabase(result.User.Uid);
 
-                // If user is not yet in database, create default
                 if (profile == null)
                 {
                     profile = new AppUser
@@ -67,135 +70,95 @@ namespace PPApp.Services
                         Uid = result.User.Uid,
                         Email = result.User.Info.Email,
                         DisplayName = result.User.Info.DisplayName ?? "",
-                        SavedRecipes = new Dictionary<string, bool>()
+                        SavedRecipes = new Dictionary<string, bool>(),
+                        Following = new List<string>()
                     };
+
                     await SaveUserToDatabase(profile);
                 }
 
-                // cache the user locally for quick restore
-                try
-                {
-                    await SecureStorage.SetAsync("user_json", JsonSerializer.Serialize(profile));
-                }
-                catch { }
+                await SecureStorage.SetAsync("user_json", JsonSerializer.Serialize(profile));
 
                 return profile;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"SignIn failed: {ex}");
+                Debug.WriteLine($"SignIn failed: {ex}");
                 return null;
             }
         }
 
-        // -----------------------------
-        // REGISTER
-        // -----------------------------
         public async Task<AppUser?> SignUp(string displayName, string email, string password)
+{
+    try
+    {
+        var result = await _client.CreateUserWithEmailAndPasswordAsync(email, password);
+
+        var token = await result.User.GetIdTokenAsync();
+        await SecureStorage.SetAsync("auth_token", token);
+
+        var appUser = new AppUser
         {
-            try
-            {
-                var result = await _client.CreateUserWithEmailAndPasswordAsync(email, password);
-                var token = await result.User.GetIdTokenAsync();
-                await SecureStorage.SetAsync("auth_token", token);
+            Uid = result.User.Uid,
+            Email = email,
+            DisplayName = displayName,
+            SavedRecipes = new Dictionary<string, bool>(),
+            Following = new List<string>()
+        };
 
-                var appUser = new AppUser
-                {
-                    Uid = result.User.Uid,
-                    Email = email,
-                    DisplayName = displayName,
-                    SavedRecipes = new Dictionary<string, bool>()
-                };
+        await SaveUserToDatabase(appUser);
 
-                await SaveUserToDatabase(appUser);
+        await SecureStorage.SetAsync("user_json", JsonSerializer.Serialize(appUser));
 
-                try
-                {
-                    await SecureStorage.SetAsync("user_json", JsonSerializer.Serialize(appUser));
-                }
-                catch { }
+        return appUser;
+    }
+    catch (Exception ex)
+    {
+        Debug.WriteLine($"SignUp failed: {ex}");
+        return null;
+    }
+}
 
-                return appUser;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"SignUp failed: {ex}");
-                return null;
-            }
+
+        public Task SignOut()
+        {
+            _client?.SignOut();
+            SecureStorage.Remove("auth_token");
+            SecureStorage.Remove("user_json");
+            return Task.CompletedTask;
         }
 
-        // -----------------------------
-        // SIGN OUT
-        // -----------------------------
-        public async Task SignOut()
-        {
-            try
-            {
-                _client?.SignOut();
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error signing out client: {ex}");
-            }
-
-            // Remove stored tokens/cache safely without throwing on missing keys
-            try
-            {
-                await Task.Run(() =>
-                {
-                    try { SecureStorage.Remove("auth_token"); } catch { }
-                    try { SecureStorage.Remove("user_json"); } catch { }
-                });
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error clearing secure storage on sign out: {ex}");
-            }
-
-            return;
-        }
-
-        // -----------------------------
-        // CHECK SIGNED-IN STATE
-        // -----------------------------
         public bool IsSignedIn => _client.User != null;
 
-        // -----------------------------
-        // GET CURRENT USER
-        // -----------------------------
         public async Task<AppUser?> GetCurrentUser()
         {
-            // If client knows about the user, fetch latest profile from DB
             if (IsSignedIn)
-            {
-                var user = _client.User;
-                if (user != null)
-                    return await GetUserFromDatabase(user.Uid);
-            }
+                return await GetUserFromDatabase(_client.User.Uid);
 
-            // fallback: try reading locally cached user JSON
             try
             {
                 var json = await SecureStorage.GetAsync("user_json");
                 if (!string.IsNullOrEmpty(json))
-                {
                     return JsonSerializer.Deserialize<AppUser>(json);
-                }
             }
             catch { }
 
             return null;
         }
 
-        // -----------------------------
-        // DATABASE HELPERS
-        // -----------------------------
         private async Task SaveUserToDatabase(AppUser user)
         {
-            await _db
-                .Child("users")
-                .Child(user.Uid)
-                .PutAsync(user);
+            try
+            {
+                await _db.Child("users")
+                         .Child(user.Uid)
+                         .PutAsync(user);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SaveUserToDatabase failed: {ex}");
+                throw;
+            }
         }
 
         private async Task<AppUser?> GetUserFromDatabase(string uid)
@@ -209,7 +172,7 @@ namespace PPApp.Services
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"GetUserFromDatabase failed: {ex}");
+                Debug.WriteLine($"GetUserFromDatabase failed: {ex}");
                 return null;
             }
         }

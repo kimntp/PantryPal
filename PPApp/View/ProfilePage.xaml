@@ -3,6 +3,7 @@
              x:Class="PPApp.View.ProfilePage"
              Title="Profile">
 
+    <ScrollView>
     <VerticalStackLayout Padding="20" Spacing="10">
         <!-- Profile Info -->
         <Image Source="profile.png" 
@@ -11,11 +12,12 @@
                HorizontalOptions="Center" />
         <Label x:Name="displayNameLabel" Text="Name: -" />
         <Label x:Name="emailLabel" Text="Email: -" />
+        <Button x:Name="btnSignOut" Text="Sign Out" Clicked="OnSignOutClicked" BackgroundColor="Red"/>
 
         <!-- Toggle Buttons -->
         <HorizontalStackLayout Spacing="10">
-            <Button x:Name="btnShowRatings" Text="Show Ratings" Clicked="OnShowRatingsClicked" />
-            <Button x:Name="btnShowRecipes" Text="Show Saved Recipes" Clicked="OnShowRecipesClicked" />
+            <Button x:Name="btnShowRatings" Text="Show Ratings" Clicked="OnShowRatingsClicked" BackgroundColor="#FFB893B8" />
+            <Button x:Name="btnShowRecipes" Text="Show Saved Recipes" Clicked="OnShowRecipesClicked" BackgroundColor="#FFB893B8" />
         </HorizontalStackLayout>
 
         <!-- Private Ratings -->
@@ -62,7 +64,6 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-
-        <Button x:Name="btnSignOut" Text="Sign Out" Clicked="OnSignOutClicked" />
     </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
