@@ -6,7 +6,7 @@ CSC 3380 | Group 16
 ### 1. Install Required SDKs
 Ensure that you have the **.NET 9.0 SDK** installed, along with the full Android development environment **(Java SDK, Android SDK, and Android Emulator)**.
 Setup instructions can be found in the official MAUI documentation [here](https://learn.microsoft.com/en-us/dotnet/maui/get-started/installation?view=net-maui-9.0&tabs=visual-studio-code#set-up-target-platforms).
-When choosing a method to download the android emulator, it is recoomend to also download Android Studio, so the virtual device can be configured to to take input from a hardware keyboard.
+> When installing the Android emulator, it is recommended to also install Android Studio, which provides a virtual device manager that allows your emulator to accept input from a physical keyboard and offers more reliable configuration options.
 
 
 ### 2. Install VS Code Extensions
