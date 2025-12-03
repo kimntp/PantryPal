@@ -3,22 +3,28 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PPApp.Controls.ComboBox">
 
-    <VerticalStackLayout x:Name="RootLayout" Spacing="0">
+    <VerticalStackLayout x:Name="RootLayout" Spacing="4">
 
-        <!-- Selected Item / Input Box -->
+        <!-- Selected ingredient chips -->
+        <FlexLayout x:Name="SelectedChipsLayout"
+                    Wrap="Wrap"
+                    Direction="Row"
+                    AlignItems="Center"
+                    AlignContent="Start" />
+
+        <!-- Input box -->
         <Border x:Name="SelectedItemBorder"
                 Stroke="#888"
                 StrokeThickness="1"
                 BackgroundColor="White"
                 Padding="10">
-
             <Entry x:Name="InputEntry"
-                   Placeholder="Select..."
+                   Placeholder="Type ingredient..."
                    FontSize="16"
                    TextChanged="OnInputTextChanged" />
         </Border>
 
-        <!-- Dropdown wrapped in Border, named Dropdown -->
+        <!-- Dropdown list -->
         <Border x:Name="Dropdown"
                 Stroke="#888"
                 StrokeThickness="1"
@@ -28,7 +34,6 @@
             <ScrollView HeightRequest="150">
                 <VerticalStackLayout x:Name="ItemsContainer" />
             </ScrollView>
-
         </Border>
 
     </VerticalStackLayout>
