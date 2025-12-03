@@ -2,65 +2,127 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:Model="clr-namespace:PPApp.Model"
-             xmlns:Controls="clr-namespace:PPApp.Controls"
+             xmlns:controls="clr-namespace:PPApp.Controls"
              x:Class="PPApp.View.SearchPage"
-             Title="Pantry Pal">
+             Title="Search">
 
-    <VerticalStackLayout Padding="10" Spacing="10">
+    <!-- Rows:
+         0: Header
+         1: Ingredient ComboBox
+         2: Match mode
+         3: Recipe grid
+    -->
+    <Grid RowDefinitions="Auto,Auto,Auto,*"
+          Padding="10">
 
-        <!-- Toolbar/Profile button can be uncommented later -->
-        <!--
-        <ToolbarItem Text="Profile"
-                     IconImageSource="profile.png"
-                     Order="Primary"
-                     Priority="0"
-                     Clicked="BtnUser_Clicked" />
-        -->
+        <!-- Header -->
+        <Label Grid.Row="0"
+               Text="Select your ingredients:"
+               FontSize="18"
+               HorizontalOptions="Center"
+               Margin="0,0,0,8" />
 
-        <Label Text="What ingredients do you have?"
-            FontSize="18"
-            HorizontalOptions="Center" />
+        <!-- Multi-select chips ComboBox -->
+        <controls:ComboBox Grid.Row="1"
+                           x:Name="IngredientCombo"
+                           SelectedItemChanged="IngredientCombo_SelectedItemChanged" />
 
-        <!-- Search Bar
-        <SearchBar x:Name="searchBar"
-                   Placeholder="e.g. chicken, tomato, rice"
-                   TextChanged="OnSearchBarTextChanged" -->
+        <!-- Match mode -->
+        <HorizontalStackLayout Grid.Row="2"
+                               Spacing="8"
+                               Margin="0,8,0,4"
+                               VerticalOptions="Center">
+            <Label Text="Match mode:"
+                   FontSize="14"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
 
-        <Controls:ComboBox x:Name="IngredientCombo"
-                   SelectedItemChanged="IngredientCombo_SelectedItemChanged"/>
+            <Label Text="OR"
+                   FontSize="13"
+                   VerticalOptions="Center" />
 
+            <Switch x:Name="MatchModeSwitch"
+                    Toggled="OnMatchModeToggled"
+                    VerticalOptions="Center" />
 
-        <!-- Most Similar Recipes Results -->
-        <CollectionView x:Name="RecipesCollectionView"
-                        SelectionMode="Single">
+            <Label Text="AND"
+                   FontSize="13"
+                   VerticalOptions="Center" />
+        </HorizontalStackLayout>
+
+        <!-- Recipe grid -->
+        <CollectionView Grid.Row="3"
+                        x:Name="RecipesCollectionView"
+                        SelectionMode="Single"
+                        VerticalOptions="FillAndExpand">
+
+            <CollectionView.ItemsLayout>
+                <!-- 2-column vertical grid -->
+                <GridItemsLayout Orientation="Vertical" Span="2" />
+            </CollectionView.ItemsLayout>
+
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="Model:Recipe">
-                    <Border Padding="10" Margin="0,5">
-                        <Grid ColumnDefinitions="120,*" ColumnSpacing="10">
+                    <Border Margin="6"
+                            Stroke="#DDDDDD"
+                            StrokeThickness="1">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
 
-                            <!-- Recipe Image -->
-                            <Image Grid.Column="0"
-                                   Source="{Binding ImageUrl}"
-                                   HeightRequest="100"
-                                   WidthRequest="120"
-                                   Aspect="AspectFill" />
+                        <!-- 3 rows: image, name, chips -->
+                        <Grid RowDefinitions="*,Auto,Auto"
+                              HeightRequest="220">
 
-                            <!-- Recipe Info -->
-                            <VerticalStackLayout Grid.Column="1"
-                                                 Spacing="4">
-                                <Label Text="{Binding Name}"
-                                       FontAttributes="Bold"
-                                       FontSize="16" />
-                                <Label Text="{Binding Url}"
-                                       FontSize="12"
-                                       TextColor="Gray"
-                                       LineBreakMode="TailTruncation" />
-                                       
-                            </VerticalStackLayout>
+                            <!-- Image on top -->
+                            <Image Grid.Row="0"
+                                   Source="{Binding DisplayImage}"
+                                   Aspect="AspectFill"
+                                   Margin="4" />
+
+                            <!-- Name (Title-cased) -->
+                            <Label Grid.Row="1"
+                                   Text="{Binding DisplayName}"
+                                   FontAttributes="Bold"
+                                   FontSize="14"
+                                   LineBreakMode="TailTruncation"
+                                   Margin="6,4,6,2" />
+
+                            <!-- Dietary chips -->
+                            <HorizontalStackLayout Grid.Row="2"
+                                                   Spacing="4"
+                                                   Margin="6,0,6,8">
+
+                                <!-- Gluten chip -->
+                                <Border IsVisible="{Binding ContainsGluten}"
+                                        BackgroundColor="#FFE0B2"
+                                        Stroke="#FFB74D"
+                                        StrokeThickness="1"
+                                        Padding="6,2">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10" />
+                                    </Border.StrokeShape>
+                                    <Label Text="Gluten"
+                                           FontSize="10" />
+                                </Border>
+
+                                <!-- Vegetarian chip (no meat) -->
+                                <Border IsVisible="{Binding IsVegetarian}"
+                                        BackgroundColor="#C8E6C9"
+                                        Stroke="#81C784"
+                                        StrokeThickness="1"
+                                        Padding="6,2">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10" />
+                                    </Border.StrokeShape>
+                                    <Label Text="Vegetarian"
+                                           FontSize="10" />
+                                </Border>
+                            </HorizontalStackLayout>
                         </Grid>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-    </VerticalStackLayout>
+    </Grid>
 </ContentPage>
