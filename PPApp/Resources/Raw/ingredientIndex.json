@@ -16121,27 +16121,6 @@
             }
         ]
     },
-    " salmon": {
-        "is_meat": true,
-        "has_gluten": false,
-        "recipes": [
-            {
-                "name": "Pasta with salmon & peas",
-                "url": "https://www.bbcgoodfood.com/recipes/pasta-salmon-peas",
-                "ingredients": [
-                    "fusilli noodles",
-                    "butter",
-                    "shallot",
-                    "peas",
-                    " salmon",
-                    "cr\u00e8me fra\u00eeche",
-                    "vegetable stock cube",
-                    "chives"
-                ],
-                "recipeID": 68
-            }
-        ]
-    },
     "vegetable stock cube": {
         "is_meat": false,
         "has_gluten": true,
