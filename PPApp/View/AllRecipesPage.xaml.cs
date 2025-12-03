@@ -40,11 +40,11 @@ public partial class AllRecipesPage : ContentPage
 
     private async void BtnRegister_Clicked(object sender, EventArgs e)
     {
-        await Navigation.PushAsync(new RegisterPage(new Service.FirebaseAuthService()));
+        await Navigation.PushAsync(new RegisterPage(new Services.FirebaseAuthService()));
     }
 
     private async void BtnLogin_Clicked(object sender, EventArgs e)
     {
-        await Navigation.PushAsync(new LoginPage(new Service.FirebaseAuthService()));
+        await Navigation.PushAsync(new LoginPage(new Services.FirebaseAuthService()));
     }
 }

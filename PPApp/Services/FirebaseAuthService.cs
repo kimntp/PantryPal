@@ -6,7 +6,7 @@ using PPApp.Model;
 using Microsoft.Maui.Storage;
 using System.Text.Json;
 
-namespace PPApp.Service
+namespace PPApp.Services
 {
     public interface IFirebaseAuthService
     {

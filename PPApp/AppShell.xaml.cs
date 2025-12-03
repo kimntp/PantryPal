@@ -1,11 +1,11 @@
-﻿using PPApp.Service;
+﻿using PPApp.Services;
 
 namespace PPApp;
 
 public partial class AppShell : Shell
 {
     private readonly IFirebaseAuthService _auth;
-
+    private IFirebaseAuthService auth;
 
     public AppShell(IFirebaseAuthService auth)
     {
@@ -36,22 +36,22 @@ public partial class AppShell : Shell
        // UpdateFlyoutItems();
     }
 
- /*    private async void UpdateFlyoutItems()
-    {
-        var user = await _auth.GetCurrentUser();
+    /*    private async void UpdateFlyoutItems()
+       {
+           var user = await _auth.GetCurrentUser();
 
-		if (user != null)
-		{
-			profileItem.IsVisible = true;
-			loginItem.IsVisible = false;
-			registerItem.IsVisible = false;
-		}
-		else
-		{
-			profileItem.IsVisible = false;
-			loginItem.IsVisible = true;
-			registerItem.IsVisible = true;
-		}
-        
-    } */
+           if (user != null)
+           {
+               profileItem.IsVisible = true;
+               loginItem.IsVisible = false;
+               registerItem.IsVisible = false;
+           }
+           else
+           {
+               profileItem.IsVisible = false;
+               loginItem.IsVisible = true;
+               registerItem.IsVisible = true;
+           }
+
+       } */
 }

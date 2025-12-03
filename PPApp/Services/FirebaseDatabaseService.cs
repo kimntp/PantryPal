@@ -3,13 +3,13 @@ using Firebase.Database.Query;
 using Newtonsoft.Json;
 using PPApp.Model;
 
-namespace PPApp.Service;
+namespace PPApp.Services;
 
-public class FirebaseUserDataService : IUserDataService
+public class FirebaseUserDatabaseService
 {
     private readonly FirebaseClient _client;
 
-    public FirebaseUserDataService()
+    public FirebaseUserDatabaseService()
     {
         _client = new FirebaseClient("https://pantry-pal-23f98-default-rtdb.firebaseio.com/");
     }
@@ -63,41 +63,25 @@ public class FirebaseUserDataService : IUserDataService
             .Child(recipe.RecipeID)
             .DeleteAsync();
     }
-    
-    public async Task<List<Recipe>> GetSavedRecipesAsync(string uid)
+           public async Task<List<Recipe>> GetAllRecipes()
+{
+    try
     {
-        try
-        {
-            // get saved recipe IDs (stored as { recipeId: true })
-            var savedNodes = await _client
-                .Child("users")
-                .Child(uid)
-                .Child("SavedRecipes")
-                .OnceAsync<bool>();
+        var recipeList = await _client
+            .Child("recipes")
+            .OnceSingleAsync<List<Recipe>>();
 
-            var savedIds = savedNodes
-                .Select(n => n.Key) // Firebase key for each child node
-                .Where(id => !string.IsNullOrEmpty(id))
-                .ToList();
-
-            if (savedIds.Count == 0)
-                return new List<Recipe>();
-
-            // 2) Fetch all recipes and filter by savedIds
-            var allRecipes = await _client
-                .Child("recipes")
-                .OnceSingleAsync<List<Recipe>>() ?? new List<Recipe>();
-
-            var savedRecipes = allRecipes
-                .Where(r => savedIds.Contains(r.RecipeID))
-                .ToList();
-
-            return savedRecipes;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("ERROR GETTING SAVED RECIPES: " + ex.Message);
-            return new List<Recipe>();
-        }
+        return recipeList ?? new List<Recipe>();
     }
-} 
+    catch (Exception ex)
+    {
+        Console.WriteLine("ERROR GETTING RECIPES: " + ex.Message);
+        return new List<Recipe>();
+    }
+}
+
+
+
+}
+
+

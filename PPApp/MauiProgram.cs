@@ -2,7 +2,7 @@
 using Firebase.Auth.Providers;
 using Microsoft.Extensions.Logging;
 
-using PPApp.Service;  
+using PPApp.Services;
 using PPApp.View;      
 
 namespace PPApp;

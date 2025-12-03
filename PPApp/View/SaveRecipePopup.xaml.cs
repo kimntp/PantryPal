@@ -1,6 +1,6 @@
 using System;
 using PPApp.Model;
-using PPApp.Service;
+using PPApp.Services;
 using Microsoft.Maui.Controls;
 
 namespace PPApp.View
@@ -9,14 +9,14 @@ namespace PPApp.View
     {
         private readonly Recipe _recipe;
         private readonly IFirebaseAuthService _authService;
-        private readonly IUserDataService _userDb;
+        private readonly FirebaseUserDatabaseService _userDb;
 
         public SaveRecipePopup(Recipe recipe, IFirebaseAuthService auth)
         {
             InitializeComponent();
             _recipe = recipe;
             _authService = auth;
-            _userDb = new FirebaseUserDataService();
+            _userDb = new FirebaseUserDatabaseService();
 
             LoadRecipe();
         }
