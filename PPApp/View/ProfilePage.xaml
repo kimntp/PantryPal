@@ -14,7 +14,7 @@
     <ListView x:Name="listRecipes" BackgroundColor="Transparent">
         <ListView.ItemTemplate>
             <DataTemplate x:DataType="Model:Recipe">
-                <TextCell Text="{Binding name}" />
+                <TextCell Text="{Binding Name}" />
             </DataTemplate>
         </ListView.ItemTemplate>
     </ListView>

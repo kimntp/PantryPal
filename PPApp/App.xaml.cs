@@ -1,13 +1,21 @@
-﻿using PPApp.View;
+﻿using PPApp.Service;
 
 namespace PPApp;
 
 public partial class App : Application
 {
-    public App()
+    private readonly IFirebaseAuthService _auth;
+
+    public App(IFirebaseAuthService auth)
     {
         InitializeComponent();
-
-        MainPage = new SearchPage();
+        _auth = auth;
     }
+
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        // Pass the auth service to AppShell
+        return new Window(new AppShell(_auth));
+    }
+
 }

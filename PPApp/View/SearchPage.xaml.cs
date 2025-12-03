@@ -29,12 +29,43 @@ public partial class SearchPage : ContentPage
         }
     }
 
-    private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
+    private async void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
     {
-        var query = e.NewTextValue;
-        var results = _indexService.SearchByIngredients(query);
-        RecipesCollectionView.ItemsSource = results;
+        try
+        {
+            // If recipes aren't loaded yet, don't try to search
+            if (_allRecipes == null || _allRecipes.Count == 0)
+            {
+                // You can decide whether to show an alert here or just ignore
+                return;
+            }
+
+            var query = e.NewTextValue ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                // Reset to full list
+                RecipesCollectionView.ItemsSource = _allRecipes;
+                return;
+            }
+
+            var results = _indexService.SearchByIngredients(query);
+
+            // Fallback in case service returns null
+            RecipesCollectionView.ItemsSource = (results == null || results.Count == 0)
+                ? _allRecipes
+                : results;
+        }
+        catch (Exception ex)
+        {
+            // Instead of crashing the whole app, show what went wrong
+            await DisplayAlert("Search error", ex.Message, "OK");
+
+            // As a fallback, reset the list so the UI doesn't get stuck
+            RecipesCollectionView.ItemsSource = _allRecipes;
+        }
     }
+
 
     private async void OnRecipeSelected(object sender, SelectionChangedEventArgs e)
     {
