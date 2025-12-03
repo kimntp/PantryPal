@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Firebase.Database;
 using Firebase.Database.Query;
 using PPApp.Model;
+using Microsoft.Maui.Storage;
 
 namespace PPApp.Services
 {
@@ -12,34 +13,28 @@ namespace PPApp.Services
     {
         private readonly FirebaseClient _client;
 
-        private Dictionary<string, IngredientMeta> _ingredientMeta =
-            new(StringComparer.OrdinalIgnoreCase);
+        // Ingredient metadata cache
+        private Dictionary<string, IngredientMeta> _ingredientMeta = new(StringComparer.OrdinalIgnoreCase);
         private bool _ingredientMetaLoaded = false;
 
-        // Cached recipes for search
+        // Recipe cache
         private List<Recipe> _cachedRecipes = new();
         private bool _recipesLoaded = false;
 
-    public FirebaseUserDatabaseService()
-    {
-        // Use SecureStorage-stored auth token when available so database writes respect rules
-        _client = new FirebaseClient(
-            "https://pantry-pal-23f98-default-rtdb.firebaseio.com/",
-            new FirebaseOptions
-            {
-                AuthTokenAsyncFactory = async () => await Microsoft.Maui.Storage.SecureStorage.GetAsync("auth_token")
-            }
-        );
-    }
-
         public FirebaseUserDatabaseService()
         {
-            _client = new FirebaseClient("https://pantry-pal-23f98-default-rtdb.firebaseio.com/");
+            _client = new FirebaseClient(
+                "https://pantry-pal-23f98-default-rtdb.firebaseio.com/",
+                new FirebaseOptions
+                {
+                    AuthTokenAsyncFactory = async () => await SecureStorage.GetAsync("auth_token")
+                }
+            );
         }
 
-        // ----------------------------------------------------
-        // Internal helper: ensure recipes are loaded from Firebase
-        // ----------------------------------------------------
+        // ------------------------------
+        // Internal: ensure all recipes are loaded and cached
+        // ------------------------------
         private async Task EnsureRecipesLoadedAsync()
         {
             if (_recipesLoaded)
@@ -49,53 +44,19 @@ namespace PPApp.Services
                 .Child("recipes")
                 .OnceSingleAsync<List<Recipe>>();
 
-    // Save Recipe
-    public async Task SaveRecipeAsync(string uid, Recipe recipe)
-    {
-        await _client
-            .Child("users")
-            .Child(uid)
-            .Child("SavedRecipes")
-            .Child(recipe.RecipeID)
-            .PutAsync(true);
-    }
             _cachedRecipes = recipeList ?? new List<Recipe>();
             _recipesLoaded = true;
         }
 
-        // ====================================================
-        // USER PROFILE + SAVED RECIPES + RATINGS (Firebase)
-        // ====================================================
-
-        // Write user profile to database
-        public async Task SaveUserProfileAsync(AppUser user)
+        // ------------------------------
+        // Recipe methods
+        // ------------------------------
+        public async Task<List<Recipe>> GetAllRecipes()
         {
-            await _client
-                .Child("users")
-                .Child(user.Uid)
-                .PutAsync(user);
+            await EnsureRecipesLoadedAsync();
+            return _cachedRecipes;
         }
 
-        // Get user profile
-        public async Task<AppUser?> GetUserProfileAsync(string uid)
-        {
-            return await _client
-                .Child("users")
-                .Child(uid)
-                .OnceSingleAsync<AppUser>();
-        }
-
-        // Update display name
-        public async Task UpdateDisplayNameAsync(string uid, string newName)
-        {
-            await _client
-                .Child("users")
-                .Child(uid)
-                .Child("DisplayName")
-                .PutAsync(newName);
-        }
-
-        // Save Recipe (flag in user's SavedRecipes)
         public async Task SaveRecipeAsync(string uid, Recipe recipe)
         {
             await _client
@@ -106,7 +67,6 @@ namespace PPApp.Services
                 .PutAsync(true);
         }
 
-        // Remove saved recipe
         public async Task RemoveRecipeAsync(string uid, Recipe recipe)
         {
             await _client
@@ -117,39 +77,10 @@ namespace PPApp.Services
                 .DeleteAsync();
         }
 
-        public async Task<Dictionary<string, IngredientMeta>> GetIngredientMetadataAsync()
-        {
-            if (_ingredientMetaLoaded)
-                return _ingredientMeta;
-
-            var nodes = await _client
-                .Child("ingredients")
-                .OnceAsync<IngredientMeta>();
-
-            _ingredientMeta = nodes
-                .Where(n => n.Object != null && !string.IsNullOrWhiteSpace(n.Object.Ingredient))
-                .ToDictionary(
-                    n => n.Object.Ingredient,
-                    n => n.Object,
-                    StringComparer.OrdinalIgnoreCase);
-
-            _ingredientMetaLoaded = true;
-            return _ingredientMeta;
-        }
-
-        // Get ALL recipes from Firebase (raw list)
-        public async Task<List<Recipe>> GetAllRecipes()
-        {
-            await EnsureRecipesLoadedAsync();
-            return _cachedRecipes;
-        }
-
-        // Get saved recipes for a user based on IDs in their profile
         public async Task<List<Recipe>> GetSavedRecipesByIdsAsync(string uid)
         {
             try
             {
-                // 1. Get the user profile
                 var user = await _client
                     .Child("users")
                     .Child(uid)
@@ -158,87 +89,29 @@ namespace PPApp.Services
                 if (user?.SavedRecipes == null || user.SavedRecipes.Count == 0)
                     return new List<Recipe>();
 
-                // Only recipe IDs marked as true
                 var savedIds = user.SavedRecipes
                     .Where(x => x.Value)
                     .Select(x => x.Key)
                     .ToList();
 
-                if (savedIds.Count == 0)
+                if (!savedIds.Any())
                     return new List<Recipe>();
 
-                // Ensure we have the full recipes list cached
                 await EnsureRecipesLoadedAsync();
 
-                // Filter cached recipes by those IDs
-                var savedRecipes = _cachedRecipes
-                    .Where(r => !string.IsNullOrEmpty(r.RecipeID)
-                             && savedIds.Contains(r.RecipeID))
+                return _cachedRecipes
+                    .Where(r => !string.IsNullOrEmpty(r.RecipeID) && savedIds.Contains(r.RecipeID))
                     .ToList();
-
-                return savedRecipes;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ERROR fetching saved recipes: " + ex.Message);
+                Console.WriteLine("Error fetching saved recipes: " + ex.Message);
                 return new List<Recipe>();
             }
         }
 
-        // Save a rating/review for a recipe by user
-        public async Task SaveRecipeRatingAsync(string uid, string recipeId, int rating, string? review)
-        {
-            var newRatingData = new Dictionary<string, object?>
-            {
-                { "rating", rating },
-                { "review", review }
-                // Optionally add timestamp
-            };
-
-            await _client
-                .Child("userReviews")
-                .Child(uid)
-                .Child(recipeId)
-                .PostAsync(newRatingData);
-        }
-
-        // ====================================================
-        // INGREDIENT + RECIPE SEARCH (using Firebase recipes)
-        // ====================================================
-
-        // Get list of all distinct ingredient names across all recipes
-        public async Task<List<string>> GetAllIngredients()
-        {
-            try
-            {
-                var list = await _client
-                    .Child("ingredients")
-                    .OnceSingleAsync<List<string>>();
-
-                if (list == null)
-                    return new List<string>();
-
-                return list
-                    .Where(s => !string.IsNullOrWhiteSpace(s))
-                    .Select(s => s.Trim())
-                    // normalize spacing/casing
-                    .Select(s => System.Globalization.CultureInfo.InvariantCulture.TextInfo
-                        .ToTitleCase(s.ToLowerInvariant()))
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .OrderBy(s => s)
-                    .ToList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("ERROR loading ingredients from Firebase: " + ex);
-                return new List<string>();
-            }
-        }
-        
-
         public async Task<List<Recipe>> SearchByIngredientsAsync(string query)
         {
-            // Ensure we’ve loaded all recipes from Firebase once
             await EnsureRecipesLoadedAsync();
 
             if (string.IsNullOrWhiteSpace(query))
@@ -247,146 +120,142 @@ namespace PPApp.Services
             var tokens = query
                 .Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(t => t.Trim().ToLowerInvariant())
-                .Where(t => t.Length > 0)
                 .Distinct()
                 .ToList();
-
-            if (tokens.Count == 0)
-                return _cachedRecipes;
 
             var scored = new List<(Recipe recipe, int score)>();
 
             foreach (var recipe in _cachedRecipes)
             {
-                if (recipe?.Ingredients == null || recipe.Ingredients.Count == 0)
+                if (recipe?.Ingredients == null || !recipe.Ingredients.Any())
                     continue;
 
-                var normalizedIngredients = recipe.Ingredients
-                    .Where(i => !string.IsNullOrWhiteSpace(i))
-                    .Select(i => i.ToLowerInvariant())
-                    .ToList();
-
-                if (normalizedIngredients.Count == 0)
-                    continue;
-
-                int score = 0;
-
-                foreach (var token in tokens)
-                {
-                    bool tokenMatches = normalizedIngredients.Any(ing =>
-                        ing.Contains(token) || token.Contains(ing));
-
-                    if (tokenMatches)
-                        score++;
-                }
+                int score = tokens.Count(token =>
+                    recipe.Ingredients.Any(i =>
+                        !string.IsNullOrWhiteSpace(i) &&
+                        (i.ToLowerInvariant().Contains(token) || token.Contains(i.ToLowerInvariant()))
+                    )
+                );
 
                 if (score > 0)
                     scored.Add((recipe, score));
             }
 
-            if (scored.Count == 0)
-                return _cachedRecipes;
-
-            return scored
-                .OrderByDescending(s => s.score)
-                .Select(s => s.recipe)
-                .ToList();
+            return scored.Any()
+                ? scored.OrderByDescending(s => s.score).Select(s => s.recipe).ToList()
+                : _cachedRecipes;
         }
 
-    }
-}
-public async Task SaveUserRatingToDatabaseAsync(string uid, Recipe recipe, RecipeRating rating)
-{
-    if (string.IsNullOrWhiteSpace(uid))
-        throw new ArgumentException("uid cannot be null or empty", nameof(uid));
-    if (recipe == null)
-        throw new ArgumentNullException(nameof(recipe));
-    if (rating == null)
-        throw new ArgumentNullException(nameof(rating));
-
-    // Sanitize recipe name to be a valid Firebase key
-    string recipeKey = recipe.Name
-        .Replace(".", "_")
-        .Replace("#", "_")
-        .Replace("$", "_")
-        .Replace("[", "_")
-        .Replace("]", "_")
-        .Replace("/", "_")
-        .Replace("&", "_")
-        .Replace("?", "_");
-
-    await _client
-        .Child("userReviews")
-        .Child(uid)
-        .Child(recipeKey) // single valid key
-        .PutAsync(rating);
-}
-public async Task<List<RecipeRating>> GetAllPublicRatingsAsync()
-{
-    try
-    {
-        var allUsers = await _client
-            .Child("userReviews")
-            .OnceAsync<Dictionary<string, RecipeRating>>();
-
-        var publicRatings = new List<RecipeRating>();
-
-        foreach (var userRatings in allUsers)
+        // ------------------------------
+        // Ingredient metadata
+        // ------------------------------
+        public async Task<Dictionary<string, IngredientMeta>> GetIngredientMetadataAsync()
         {
-            foreach (var ratingEntry in userRatings.Object.Values)
+            if (_ingredientMetaLoaded)
+                return _ingredientMeta;
+
+            var nodes = await _client.Child("ingredients").OnceAsync<IngredientMeta>();
+
+            _ingredientMeta = nodes
+                .Where(n => n.Object != null && !string.IsNullOrWhiteSpace(n.Object.Ingredient))
+                .ToDictionary(n => n.Object.Ingredient, n => n.Object, StringComparer.OrdinalIgnoreCase);
+
+            _ingredientMetaLoaded = true;
+            return _ingredientMeta;
+        }
+
+        public async Task<List<string>> GetAllIngredients()
+        {
+            try
             {
-                if (ratingEntry.IsPublic)
-                    publicRatings.Add(ratingEntry);
+                var list = await _client.Child("ingredients").OnceSingleAsync<List<string>>();
+                if (list == null) return new List<string>();
+
+                return list
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Select(s => System.Globalization.CultureInfo.InvariantCulture.TextInfo
+                        .ToTitleCase(s.Trim().ToLowerInvariant()))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(s => s)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error loading ingredients: " + ex.Message);
+                return new List<string>();
             }
         }
 
-        return publicRatings.OrderByDescending(r => r.Date).ToList();
+        // ------------------------------
+        // User profile
+        // ------------------------------
+        public async Task SaveUserToDatabaseAsync(AppUser user)
+        {
+            if (user == null || string.IsNullOrEmpty(user.Uid))
+                throw new ArgumentException("User or UID is null");
+
+            await _client.Child("users").Child(user.Uid).PutAsync(user);
+        }
+
+        public async Task<AppUser?> GetUserProfileAsync(string uid)
+        {
+            return await _client.Child("users").Child(uid).OnceSingleAsync<AppUser>();
+        }
+
+        public async Task UpdateDisplayNameAsync(string uid, string newName)
+        {
+            await _client.Child("users").Child(uid).Child("DisplayName").PutAsync(newName);
+        }
+
+        // ------------------------------
+        // Ratings
+        // ------------------------------
+        public async Task SaveUserRatingToDatabaseAsync(string uid, Recipe recipe, RecipeRating rating)
+        {
+            if (string.IsNullOrWhiteSpace(uid) || recipe == null || rating == null)
+                throw new ArgumentException("UID, recipe, or rating is null");
+
+            string recipeKey = recipe.Name
+                .Replace(".", "_").Replace("#", "_").Replace("$", "_")
+                .Replace("[", "_").Replace("]", "_")
+                .Replace("/", "_").Replace("&", "_").Replace("?", "_");
+
+            await _client.Child("userReviews").Child(uid).Child(recipeKey).PutAsync(rating);
+        }
+
+        public async Task<List<RecipeRating>> GetAllPublicRatingsAsync()
+        {
+            try
+            {
+                var allUsers = await _client.Child("userReviews").OnceAsync<Dictionary<string, RecipeRating>>();
+                var publicRatings = new List<RecipeRating>();
+
+                foreach (var userRatings in allUsers)
+                    foreach (var ratingEntry in userRatings.Object.Values)
+                        if (ratingEntry.IsPublic)
+                            publicRatings.Add(ratingEntry);
+
+                return publicRatings.OrderByDescending(r => r.Date).ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error fetching ratings: " + ex.Message);
+                return new List<RecipeRating>();
+            }
+        }
+
+        public async Task<List<RecipeRating>> GetUserRatingsAsync(string uid)
+        {
+            var ratings = await _client.Child("userReviews").Child(uid).OnceAsync<RecipeRating>();
+            return ratings.Select(r => r.Object).ToList();
+        }
+
+        public async Task<List<RecipeRating>> GetUserPublicRatingsAsync(string uid)
+        {
+            if (string.IsNullOrWhiteSpace(uid)) return new List<RecipeRating>();
+
+            var ratings = await _client.Child("userReviews").Child(uid).OnceAsync<RecipeRating>();
+            return ratings.Select(r => r.Object).Where(r => r.IsPublic).OrderByDescending(r => r.Date).ToList();
+        }
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine("Error fetching ratings: " + ex.Message);
-        return new List<RecipeRating>();
-    }
-}
-public async Task<List<RecipeRating>> GetUserRatingsAsync(string uid)
-{
-    var ratings = await _client
-        .Child("userReviews")
-        .Child(uid)
-        .OnceAsync<RecipeRating>();
-
-    return ratings.Select(r => r.Object).ToList();
-}
-public async Task<List<RecipeRating>> GetUserPublicRatingsAsync(string uid)
-{
-    if (string.IsNullOrWhiteSpace(uid))
-        return new List<RecipeRating>();
-
-    // Fetch all ratings for the user
-    var ratings = await _client
-        .Child("userReviews")
-        .Child(uid)
-        .OnceAsync<RecipeRating>();
-
-    // Filter only public ratings
-    return ratings
-        .Select(r => r.Object)
-        .Where(r => r.IsPublic)   // <-- only keep public ones
-        .OrderByDescending(r => r.Date) // optional: sort by date
-        .ToList();
-}
-public async Task SaveUserToDatabaseAsync(AppUser user)
-{
-    if (user == null || string.IsNullOrEmpty(user.Uid))
-        throw new ArgumentException("User or User ID is null");
-
-    await _client
-        .Child("users")
-        .Child(user.Uid)
-        .PutAsync(user);
-}
-
-
-
-
 }
