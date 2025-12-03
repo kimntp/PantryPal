@@ -1,7 +1,7 @@
 using System.Text.Json;
 using PPApp.Model;
 
-namespace PPApp.Service
+namespace PPApp.Services
 {
     public class IngredientIndexService
     {

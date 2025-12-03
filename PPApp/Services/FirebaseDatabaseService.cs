@@ -5,12 +5,11 @@ using PPApp.Model;
 
 namespace PPApp.Services;
 
-public class FirebaseUserDatabaseService
+
 public class FirebaseUserDatabaseService
 {
     private readonly FirebaseClient _client;
 
-    public FirebaseUserDatabaseService()
     public FirebaseUserDatabaseService()
     {
         _client = new FirebaseClient("https://pantry-pal-23f98-default-rtdb.firebaseio.com/");
@@ -148,9 +147,5 @@ public async Task SaveRecipeRatingAsync(string uid, string recipeId, int rating,
         // and store the newRatingData within it.
         .PostAsync(newRatingData);
 }
-
-
-
-
 
 }

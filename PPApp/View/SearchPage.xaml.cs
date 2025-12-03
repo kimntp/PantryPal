@@ -1,12 +1,12 @@
 using PPApp.Model;
-using PPApp.Service;
+using PPApp.Services;
 
 namespace PPApp.View;
 
 public partial class SearchPage : ContentPage
 {
-    private readonly IngredientIndexService _indexService = new();
-    private List<Recipe> _allRecipes = [];
+    private readonly IngredientIndexService _indexService = new IngredientIndexService();
+    private List<Recipe> _allRecipes = new List<Recipe>();
 
     public SearchPage()
     {
