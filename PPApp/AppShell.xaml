@@ -3,15 +3,43 @@
     x:Class="PPApp.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:PPApp"
     xmlns:View="clr-namespace:PPApp.View"
-
     Title="PPApp">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate View:AllRecipesPage}"
-        Route="AllRecipesPage" /> 
-        <!-- Route is the name of the page and content template is the page type-->
+    <!-- Bottom TabBar with all pages -->
+    <TabBar>
+        <ShellContent
+            Title="Home"
+            Icon="home.png"
+            ContentTemplate="{DataTemplate View:AllRecipesPage}"
+            Route="HomePage" />
+
+        <ShellContent
+            Title="Search"
+            Icon="search.png"
+            ContentTemplate="{DataTemplate View:SearchPage}"
+            Route="SearchPage" />
+
+        <ShellContent
+            Title="Ratings Feed"
+            Icon="ratings.png"
+            ContentTemplate="{DataTemplate View:RatingsFeedPage}"
+            Route="RatingsFeedPage" />
+
+        <ShellContent
+            Title="Profile"
+            Icon="profile.png"
+            ContentTemplate="{DataTemplate View:ProfilePage}"
+            Route="ProfilePage" />
+
+        <ShellContent
+            Title="Login/Register"
+            Icon="profile.png"
+            ContentTemplate="{DataTemplate View:LoginRegisterPage}"
+            Route="LoginRegisterPage" />
+
+
+
+    </TabBar>
 
 </Shell>

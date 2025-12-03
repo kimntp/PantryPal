@@ -1,14 +1,36 @@
-﻿
+﻿using PPApp.Services;
 
 namespace PPApp;
 
 public partial class AppShell : Shell
 {
-	public AppShell()
-	{
-		InitializeComponent();
-		//must include pages here in in order to navigate to them
-		Routing.RegisterRoute(nameof(View.AllRecipesPage), typeof(View.AllRecipesPage));
-		Routing.RegisterRoute(nameof(View.SearchPage), typeof(View.SearchPage));
-	}
+    private readonly IFirebaseAuthService _auth;
+    private IFirebaseAuthService auth;
+
+    public AppShell(IFirebaseAuthService auth)
+    {
+        InitializeComponent();
+        _auth = auth;
+
+        Routing.RegisterRoute(nameof(View.AllRecipesPage), typeof(View.AllRecipesPage));
+        Routing.RegisterRoute(nameof(View.SearchPage), typeof(View.SearchPage));
+        Routing.RegisterRoute(nameof(View.ProfilePage), typeof(View.ProfilePage));
+        Routing.RegisterRoute(nameof(View.RatingsFeedPage), typeof(View.RatingsFeedPage));
+
+        // Check auth state and navigate to Login if needed
+        Dispatcher.Dispatch(async () =>
+        {
+            try
+            {
+                var user = await _auth.GetCurrentUser();
+                if (user == null)
+                {
+                    // push LoginPage so user can sign in
+                    await Current.Navigation.PushAsync(new View.LoginPage(_auth));
+                }
+            }
+            catch { }
+        });
+    }
+
 }

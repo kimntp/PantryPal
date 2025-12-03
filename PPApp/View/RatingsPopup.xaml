@@ -1,0 +1,54 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PPApp.View.RatingsPopup"
+             BackgroundColor="#80000000">
+
+    <VerticalStackLayout BackgroundColor="White"
+                         Padding="20"
+                         Spacing="15"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center"
+                         WidthRequest="300"
+                         MaximumWidthRequest="350"
+                         >
+
+        <Label x:Name="recipeNameLabel"
+               FontSize="22"
+               HorizontalOptions="Center"
+               FontAttributes="Bold" />
+
+        <!-- 5-star selection -->
+        <HorizontalStackLayout x:Name="starLayout"
+                               Spacing="6"
+                               HorizontalOptions="Center">
+            <Button Text="☆" FontSize="20" Clicked="OnStarClicked"/>
+            <Button Text="☆" FontSize="20" Clicked="OnStarClicked"/>
+            <Button Text="☆" FontSize="20" Clicked="OnStarClicked"/>
+            <Button Text="☆" FontSize="20" Clicked="OnStarClicked"/>
+            <Button Text="☆" FontSize="20" Clicked="OnStarClicked"/>
+        </HorizontalStackLayout>
+
+        <!-- PUBLIC/PRIVATE TOGGLE -->
+        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+            <ImageButton x:Name="toggleIcon"
+                        BorderColor="Gray"
+                         WidthRequest="32"
+                         HeightRequest="32"
+                         Source="lock.png"
+                         Clicked="OnToggleVisibilityClicked"/>
+
+            <Label x:Name="toggleLabel"
+                   Text="Private"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
+        </HorizontalStackLayout>
+
+        <Editor x:Name="descriptionEditor"
+                Placeholder="Write a review..."
+                HeightRequest="100"
+                AutoSize="TextChanges" />
+
+        <Button Text="Submit" Clicked="OnSubmitClicked"/>
+        <Button Text="Cancel" Clicked="OnCancelClicked"/>
+    </VerticalStackLayout>
+</ContentPage>

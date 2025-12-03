@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PPApp.Controls.ComboBox">
+
+    <VerticalStackLayout x:Name="RootLayout" Spacing="4">
+
+        <!-- Selected ingredient chips -->
+        <FlexLayout x:Name="SelectedChipsLayout"
+                    Wrap="Wrap"
+                    Direction="Row"
+                    AlignItems="Center"
+                    AlignContent="Start" />
+
+        <!-- Input box -->
+        <Border x:Name="SelectedItemBorder"
+                Stroke="#888"
+                StrokeThickness="1"
+                BackgroundColor="White"
+                Padding="10">
+            <Entry x:Name="InputEntry"
+                   Placeholder="Type ingredient..."
+                   FontSize="16"
+                   TextChanged="OnInputTextChanged" />
+        </Border>
+
+        <!-- Dropdown list -->
+        <Border x:Name="Dropdown"
+                Stroke="#888"
+                StrokeThickness="1"
+                BackgroundColor="White"
+                IsVisible="False">
+
+            <ScrollView HeightRequest="150">
+                <VerticalStackLayout x:Name="ItemsContainer" />
+            </ScrollView>
+        </Border>
+
+    </VerticalStackLayout>
+</ContentView>
