@@ -6,48 +6,46 @@
              Title="Ratings Feed">
 
     <ContentPage.Content>
-
         <VerticalStackLayout Padding="15" Spacing="15">
 
-            <!-- Add Rating Button -->
-            <Button Text="Add Rating"
-                    x:Name="addRatingButton"
-                    HeightRequest="45"
-                    Clicked="OnAddRatingClicked"/>
-
-            <!-- Ratings Feed -->
-            <CollectionView x:Name="ratingsFeedView"
-                            SelectionMode="None">
-
-                <CollectionView.ItemTemplate>
+            <!-- Ratings Feed as ListView -->
+            <ListView x:Name="ratingsFeedView"
+                      HasUnevenRows="True"
+                      SeparatorVisibility="Default"
+                      ItemTapped="OnRatingTapped">
+                
+                <ListView.ItemTemplate>
                     <DataTemplate x:DataType="Model:RecipeRating">
-                        <VerticalStackLayout Padding="15" Spacing="8" Margin="0,0,0,20"
-                                             BackgroundColor="White">
+                        <ViewCell>
+                            <Frame Padding="10" Margin="0,0,0,15" BackgroundColor="White" CornerRadius="8">
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="{Binding UserName}" 
+                                           FontSize="16" 
+                                           FontAttributes="Bold" />
 
-                            <Label Text="{Binding UserName}"
-                                   FontSize="16" FontAttributes="Bold" />
+                                    <Label Text="{Binding RecipeName}" 
+                                           FontSize="14" 
+                                           TextColor="#444" />
 
-                            <Label Text="{Binding RecipeName}"
-                                   FontSize="14" TextColor="#444" />
+                                    <Label Text="{Binding StarsDisplay}" 
+                                           FontSize="20" 
+                                           TextColor="#f5a623" />
 
-                            <Label Text="{Binding StarsDisplay}"
-                                   FontSize="20"
-                                   TextColor="#f5a623" />
+                                    <Label Text="{Binding Review}" 
+                                           FontSize="14" 
+                                           TextColor="#222" />
 
-                            <Label Text="{Binding Review}"
-                                   FontSize="14"
-                                   TextColor="#222" />
-
-                            <Label Text="{Binding Date, StringFormat='{0:MMM dd, yyyy}'}"
-                                   FontSize="12"
-                                   TextColor="#777" />
-                        </VerticalStackLayout>
+                                    <Label Text="{Binding Date, StringFormat='{0:MMM dd, yyyy}'}" 
+                                           FontSize="12" 
+                                           TextColor="#777" />
+                                </VerticalStackLayout>
+                            </Frame>
+                        </ViewCell>
                     </DataTemplate>
-                </CollectionView.ItemTemplate>
+                </ListView.ItemTemplate>
 
-            </CollectionView>
+            </ListView>
 
         </VerticalStackLayout>
-
     </ContentPage.Content>
 </ContentPage>

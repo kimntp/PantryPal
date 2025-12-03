@@ -3,33 +3,43 @@
     x:Class="PPApp.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:PPApp"
     xmlns:View="clr-namespace:PPApp.View"
-    FlyoutBehavior="Flyout"
-
     Title="PPApp">
 
-       <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate View:AllRecipesPage}" />
+    <!-- Bottom TabBar with all pages -->
+    <TabBar>
+        <ShellContent
+            Title="Home"
+            Icon="home.png"
+            ContentTemplate="{DataTemplate View:AllRecipesPage}"
+            Route="HomePage" />
 
-    <FlyoutItem Title="Search" FlyoutDisplayOptions="AsMultipleItems">
-        <ShellContent Title="Search" Route="SearchPage" ContentTemplate="{DataTemplate View:SearchPage}" />
-    </FlyoutItem>
-    <FlyoutItem x:Name="loginItem" Title="Login" FlyoutDisplayOptions="AsMultipleItems">
-        <ShellContent Title="Login" Route="LoginPage" ContentTemplate="{DataTemplate View:LoginPage}" />
-    </FlyoutItem>
-    <FlyoutItem x:Name="registerItem" Title="Register" FlyoutDisplayOptions="AsMultipleItems">
-        <ShellContent Title="Register" Route="RegisterPage" ContentTemplate="{DataTemplate View:RegisterPage}" />
-    </FlyoutItem>
-    <FlyoutItem x:Name="profileItem" Title="My Profile" FlyoutDisplayOptions="AsMultipleItems">
-        <ShellContent Title="Profile" Route="ProfilePage" ContentTemplate="{DataTemplate View:ProfilePage}" />
-    </FlyoutItem>
-    <FlyoutItem x:Name="ratingsFeedItem" Title="Ratings Feed" FlyoutDisplayOptions="AsMultipleItems">
-        <ShellContent Title="Ratings Feed" Route="RatingsFeedPage" ContentTemplate="{DataTemplate View:RatingsFeedPage}" />
-    </FlyoutItem>
+        <ShellContent
+            Title="Search"
+            Icon="search.png"
+            ContentTemplate="{DataTemplate View:SearchPage}"
+            Route="SearchPage" />
 
-        
-        <!-- Route is the name of the page and content template is the page type-->
+        <ShellContent
+            Title="Ratings Feed"
+            Icon="ratings.png"
+            ContentTemplate="{DataTemplate View:RatingsFeedPage}"
+            Route="RatingsFeedPage" />
+
+        <ShellContent
+            Title="Profile"
+            Icon="profile.png"
+            ContentTemplate="{DataTemplate View:ProfilePage}"
+            Route="ProfilePage" />
+
+        <ShellContent
+            Title="Login/Register"
+            Icon="profile.png"
+            ContentTemplate="{DataTemplate View:LoginRegisterPage}"
+            Route="LoginRegisterPage" />
+
+
+
+    </TabBar>
 
 </Shell>

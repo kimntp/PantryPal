@@ -12,17 +12,16 @@ public class FirebaseUserDatabaseService
 
     public FirebaseUserDatabaseService()
     {
-        _client = new FirebaseClient("https://pantry-pal-23f98-default-rtdb.firebaseio.com/");
+        // Use SecureStorage-stored auth token when available so database writes respect rules
+        _client = new FirebaseClient(
+            "https://pantry-pal-23f98-default-rtdb.firebaseio.com/",
+            new FirebaseOptions
+            {
+                AuthTokenAsyncFactory = async () => await Microsoft.Maui.Storage.SecureStorage.GetAsync("auth_token")
+            }
+        );
     }
 
-    // Write user profile to database
-    public async Task SaveUserProfileAsync(AppUser user)
-    {
-        await _client
-            .Child("users")
-            .Child(user.Uid)
-            .PutAsync(user);
-    }
 
     // Get user profile
     public async Task<AppUser?> GetUserProfileAsync(string uid)
@@ -31,16 +30,6 @@ public class FirebaseUserDatabaseService
             .Child("users")
             .Child(uid)
             .OnceSingleAsync<AppUser>();
-    }
-
-    // Update display name
-    public async Task UpdateDisplayNameAsync(string uid, string newName)
-    {
-        await _client
-            .Child("users")
-            .Child(uid)
-            .Child("DisplayName")
-            .PutAsync(newName);
     }
 
     // Save Recipe
@@ -125,27 +114,98 @@ public class FirebaseUserDatabaseService
         return new List<Recipe>();
     }
 }
-public async Task SaveRecipeRatingAsync(string uid, string recipeId, int rating, string? review)
+public async Task SaveUserRatingToDatabaseAsync(string uid, Recipe recipe, RecipeRating rating)
 {
-    // The data to be saved for the specific review
-    var newRatingData = new Dictionary<string, object?>
-    {
-        { "rating", rating },
-        { "review", review }
-        // You might want to add a timestamp here too, e.g.,
-        // { "timestamp", Firebase.Database.ServerValue.Timestamp }
-    };
+    if (string.IsNullOrWhiteSpace(uid))
+        throw new ArgumentException("uid cannot be null or empty", nameof(uid));
+    if (recipe == null)
+        throw new ArgumentNullException(nameof(recipe));
+    if (rating == null)
+        throw new ArgumentNullException(nameof(rating));
 
-    // Corrected way to use PushAsync:
-    // Call PushAsync on the specific Child reference where you want the new, unique key to be created.
+    // Sanitize recipe name to be a valid Firebase key
+    string recipeKey = recipe.Name
+        .Replace(".", "_")
+        .Replace("#", "_")
+        .Replace("$", "_")
+        .Replace("[", "_")
+        .Replace("]", "_")
+        .Replace("/", "_")
+        .Replace("&", "_")
+        .Replace("?", "_");
+
     await _client
-        .Child("userReviews") // Top-level node for all user-submitted reviews
-        .Child(uid)           // Specific user's ID
-        .Child(recipeId)      // Specific recipe ID this user is reviewing
-        // NOW, call PushAsync here. This will create a NEW, UNIQUE child node
-        // (e.g., -M1aB2cD3eF4gH5iJ6kL) under "/userReviews/{uid}/{recipeId}"
-        // and store the newRatingData within it.
-        .PostAsync(newRatingData);
+        .Child("userReviews")
+        .Child(uid)
+        .Child(recipeKey) // single valid key
+        .PutAsync(rating);
 }
+public async Task<List<RecipeRating>> GetAllPublicRatingsAsync()
+{
+    try
+    {
+        var allUsers = await _client
+            .Child("userReviews")
+            .OnceAsync<Dictionary<string, RecipeRating>>();
+
+        var publicRatings = new List<RecipeRating>();
+
+        foreach (var userRatings in allUsers)
+        {
+            foreach (var ratingEntry in userRatings.Object.Values)
+            {
+                if (ratingEntry.IsPublic)
+                    publicRatings.Add(ratingEntry);
+            }
+        }
+
+        return publicRatings.OrderByDescending(r => r.Date).ToList();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error fetching ratings: " + ex.Message);
+        return new List<RecipeRating>();
+    }
+}
+public async Task<List<RecipeRating>> GetUserRatingsAsync(string uid)
+{
+    var ratings = await _client
+        .Child("userReviews")
+        .Child(uid)
+        .OnceAsync<RecipeRating>();
+
+    return ratings.Select(r => r.Object).ToList();
+}
+public async Task<List<RecipeRating>> GetUserPublicRatingsAsync(string uid)
+{
+    if (string.IsNullOrWhiteSpace(uid))
+        return new List<RecipeRating>();
+
+    // Fetch all ratings for the user
+    var ratings = await _client
+        .Child("userReviews")
+        .Child(uid)
+        .OnceAsync<RecipeRating>();
+
+    // Filter only public ratings
+    return ratings
+        .Select(r => r.Object)
+        .Where(r => r.IsPublic)   // <-- only keep public ones
+        .OrderByDescending(r => r.Date) // optional: sort by date
+        .ToList();
+}
+public async Task SaveUserToDatabaseAsync(AppUser user)
+{
+    if (user == null || string.IsNullOrEmpty(user.Uid))
+        throw new ArgumentException("User or User ID is null");
+
+    await _client
+        .Child("users")
+        .Child(user.Uid)
+        .PutAsync(user);
+}
+
+
+
 
 }

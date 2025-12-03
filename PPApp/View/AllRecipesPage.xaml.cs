@@ -7,13 +7,15 @@ public partial class AllRecipesPage : ContentPage
 {
     private readonly FirebaseUserDatabaseService _indexService;
     private readonly IFirebaseAuthService _auth;
-    private List<Recipe> _allRecipes = new List<Recipe>();
+
+    public List<Recipe> Recipes { get; set; } = new(); // Initialize to avoid null binding
 
     public AllRecipesPage(IFirebaseAuthService auth, FirebaseUserDatabaseService indexService)
     {
         InitializeComponent();
         _auth = auth;
         _indexService = indexService;
+        BindingContext = this; // Set BindingContext for data binding
     }
 
     protected override async void OnAppearing()
@@ -28,34 +30,34 @@ public partial class AllRecipesPage : ContentPage
         {
             var recipeList = await _indexService.GetAllRecipes();
 
-            if (recipeList == null || recipeList.Count == 0)
+            if (recipeList == null || !recipeList.Any())
             {
                 await DisplayAlert("Info", "No recipes found.", "OK");
                 return;
             }
 
-            int index = 0;
-            foreach (var item in recipeList)
+            // Assign temporary IDs if missing
+            for (int i = 0; i < recipeList.Count; i++)
             {
-                if (string.IsNullOrEmpty(item.RecipeID))
-                    item.RecipeID = index.ToString();
-                index++;
+                if (string.IsNullOrEmpty(recipeList[i].RecipeID))
+                    recipeList[i].RecipeID = i.ToString();
             }
 
-            _allRecipes = recipeList.ToList();
-            listRecipes.ItemsSource = _allRecipes;
+            Recipes = recipeList.ToList();
+            listRecipes.ItemsSource = Recipes; // Bind to CollectionView
         }
         catch (Exception ex)
         {
             await DisplayAlert("Error", $"Failed to load recipes: {ex.Message}", "OK");
         }
     }
-    private async void OnRecipe_Tapped(object sender, ItemTappedEventArgs e) 
-    { 
-        if (e.Item is Recipe recipe) 
-        { 
-            await Navigation.PushModalAsync(new SaveRecipePopup(recipe, _auth)); 
-            listRecipes.SelectedItem = null; 
+
+    private async void OnRecipe_Selected(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection is Recipe recipe)
+        {
+            await Navigation.PushModalAsync(new SaveRecipePopup(recipe, _auth));
+            ((CollectionView)sender).SelectedItem = null; // Deselect
         }
-}
+    }
 }

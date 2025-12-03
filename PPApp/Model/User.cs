@@ -10,5 +10,7 @@ namespace PPApp.Model
 
         // App-specific fields
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public List<string>? Following { get; set; } = new();
     }
 }
