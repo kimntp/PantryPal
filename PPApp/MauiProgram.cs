@@ -27,7 +27,6 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<IFirebaseAuthService, FirebaseAuthService>();
         builder.Services.AddSingleton<FirebaseUserDatabaseService>();
-        builder.Services.AddSingleton<IngredientIndexService>();
 
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<RegisterPage>();
