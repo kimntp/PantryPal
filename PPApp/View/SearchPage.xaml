@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:Model="clr-namespace:PPApp.Model"
+             xmlns:Controls="clr-namespace:PPApp.Controls"
              x:Class="PPApp.View.SearchPage"
              Title="Pantry Pal">
 
@@ -20,10 +21,14 @@
             FontSize="18"
             HorizontalOptions="Center" />
 
-        <!-- Search Bar -->
+        <!-- Search Bar
         <SearchBar x:Name="searchBar"
                    Placeholder="e.g. chicken, tomato, rice"
-                   TextChanged="OnSearchBarTextChanged" />
+                   TextChanged="OnSearchBarTextChanged" -->
+
+        <Controls:ComboBox x:Name="IngredientCombo"
+                   SelectedItemChanged="IngredientCombo_SelectedItemChanged"/>
+
 
         <!-- Most Similar Recipes Results -->
         <CollectionView x:Name="RecipesCollectionView"

@@ -6,7 +6,7 @@ namespace PPApp.View;
 public partial class SearchPage : ContentPage
 {
     private readonly IngredientIndexService _indexService = new();
-    private List<Recipe> _allRecipes = new();
+    private List<Recipe> _allRecipes = [];
 
     public SearchPage()
     {
@@ -14,14 +14,20 @@ public partial class SearchPage : ContentPage
         InitAsync();
     }
 
-    private async void InitAsync()
+private async void InitAsync()
     {
         try
         {
             await _indexService.InitializeAsync();
             _allRecipes = _indexService.GetAllRecipes();
+
+            // Show all recipes initially
             RecipesCollectionView.ItemsSource = _allRecipes;
             RecipesCollectionView.SelectionChanged += OnRecipeSelected;
+
+            // Populate ComboBox with ingredient names from the index
+            var allIngredients = _indexService.GetAllIngredients();
+            IngredientCombo.ItemsSource = allIngredients;
         }
         catch (Exception ex)
         {
@@ -29,53 +35,64 @@ public partial class SearchPage : ContentPage
         }
     }
 
-    private async void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
+
+private async void OnRecipeSelected(object sender, SelectionChangedEventArgs e)
+{
+    // when nothing is selected
+    if (e?.CurrentSelection == null || e.CurrentSelection.Count == 0)
+        return;
+
+    if (e.CurrentSelection.FirstOrDefault() is Recipe recipe)
     {
-        try
+        // visual confirmation
+        await DisplayAlert("Recipe Selected", recipe.Name, "OK");
+
+        // Later: open SaveRecipePopup or navigate to a detail page
+        // await Navigation.PushModalAsync(new SaveRecipePopup(recipe, _userDataService, _userId));
+    }
+
+    ((CollectionView)sender).SelectedItem = null;
+}
+
+
+private async void IngredientCombo_SelectedItemChanged(object sender, EventArgs e)
+{
+    try
+    {
+        // Make sure we actually have a selection
+        if (IngredientCombo.SelectedItem is not string ingredient ||
+            string.IsNullOrWhiteSpace(ingredient))
         {
-            // If recipes aren't loaded yet, don't try to search
-            if (_allRecipes == null || _allRecipes.Count == 0)
-            {
-                // You can decide whether to show an alert here or just ignore
-                return;
-            }
-
-            var query = e.NewTextValue ?? string.Empty;
-
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                // Reset to full list
-                RecipesCollectionView.ItemsSource = _allRecipes;
-                return;
-            }
-
-            var results = _indexService.SearchByIngredients(query);
-
-            // Fallback in case service returns null
-            RecipesCollectionView.ItemsSource = (results == null || results.Count == 0)
-                ? _allRecipes
-                : results;
+            return;
         }
-        catch (Exception ex)
-        {
-            // Instead of crashing the whole app, show what went wrong
-            await DisplayAlert("Search error", ex.Message, "OK");
 
-            // As a fallback, reset the list so the UI doesn't get stuck
+        // Make sure recipes are loaded
+        if (_allRecipes == null || _allRecipes.Count == 0)
+        {
+            RecipesCollectionView.ItemsSource = _allRecipes;
+            return;
+        }
+
+        // Run the search using the ingredient text
+        var results = _indexService.SearchByIngredients(ingredient);
+
+        // If search returns nothing or null, fall back to full list
+        if (results == null || results.Count == 0)
+        {
             RecipesCollectionView.ItemsSource = _allRecipes;
         }
-    }
-
-
-    private async void OnRecipeSelected(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.CurrentSelection?.FirstOrDefault() is Recipe recipe)
+        else
         {
-            await DisplayAlert("Recipe Selected", recipe.Name, "OK");
-
-            //await Navigation.PushModalAsync(new SaveRecipePopup(recipe, _userDataService, _userId));
+            RecipesCollectionView.ItemsSource = results;
         }
-
-        ((CollectionView)sender).SelectedItem = null;
+    }
+    catch (Exception ex)
+    {
+        // Instead of crashing the whole app, show the real error
+        await DisplayAlert("Ingredient filter error", ex.Message, "OK");
+        RecipesCollectionView.ItemsSource = _allRecipes;
     }
 }
+
+}
+

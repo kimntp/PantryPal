@@ -42,6 +42,17 @@ namespace PPApp.Service
             return _allRecipes;
         }
 
+        public List<string> GetAllIngredients()
+        {
+            if (_index == null || _index.Count == 0)
+                return new List<string>();
+
+            return _index.Keys
+                .OrderBy(k => k)
+                .ToList();
+        }
+ 
+
         public List<Recipe> SearchByIngredients(string query)
         {
             if (string.IsNullOrWhiteSpace(query))
