@@ -22,6 +22,12 @@ public partial class RegisterPage : ContentPage
             return;
         }
 
-        await Shell.Current.GoToAsync(nameof(AllRecipesPage));
+       await Navigation.PopModalAsync();
+    }
+    private async void OnCancelClicked(object sender, EventArgs e)
+    {
+        await Navigation.PopModalAsync();
+        await Navigation.PopModalAsync();
+        
     }
 }

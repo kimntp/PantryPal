@@ -127,12 +127,32 @@ namespace PPApp.Services
         // -----------------------------
         // SIGN OUT
         // -----------------------------
-        public Task SignOut()
+        public async Task SignOut()
         {
-            _client.SignOut();
-            SecureStorage.Remove("auth_token");
-            try { SecureStorage.Remove("user_json"); } catch { }
-            return Task.CompletedTask;
+            try
+            {
+                _client?.SignOut();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error signing out client: {ex}");
+            }
+
+            // Remove stored tokens/cache safely without throwing on missing keys
+            try
+            {
+                await Task.Run(() =>
+                {
+                    try { SecureStorage.Remove("auth_token"); } catch { }
+                    try { SecureStorage.Remove("user_json"); } catch { }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error clearing secure storage on sign out: {ex}");
+            }
+
+            return;
         }
 
         // -----------------------------

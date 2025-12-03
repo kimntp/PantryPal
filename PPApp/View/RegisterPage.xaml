@@ -17,5 +17,10 @@
 
         <Button Text="Sign Up"
                 Clicked="OnRegisterClicked" />
+                
+              <Button Text="Cancel"
+                Clicked="OnCancelClicked"
+                BackgroundColor="Transparent"
+                TextColor="Gray" />
     </VerticalStackLayout>
 </ContentPage>
