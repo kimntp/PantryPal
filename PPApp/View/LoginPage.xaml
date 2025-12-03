@@ -24,6 +24,10 @@
                 Clicked="OnRegisterClicked"
                 BackgroundColor="Transparent"
                 TextColor="Blue" />
+              <Button Text="Cancel"
+                Clicked="OnCancelClicked"
+                BackgroundColor="Transparent"
+                TextColor="Gray" />
     </VerticalStackLayout>
 
 </ContentPage>

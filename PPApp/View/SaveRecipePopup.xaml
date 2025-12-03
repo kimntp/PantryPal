@@ -7,12 +7,16 @@
         <Label x:Name="recipeNameLabel"
                FontSize="22"
                FontAttributes="Bold" />
-
-        <Label Text="Ingredients:" FontAttributes="Bold" />
+       
+       <Label Text="Ingredients:" FontAttributes="Bold" />
         <Label x:Name="ingredientsLabel" />
-        <Label Text="URL:" FontAttributes="Bold" />
-        <Label x:Name="urlLabel"
-               TextColor="Blue" />
+
+              <Button x:Name="urlButton"
+                TextColor="Blue"
+                BackgroundColor="Transparent"
+                HorizontalOptions="Start"
+                Clicked="OnUrlClicked" />
+
 
         <Button Text="Save Recipe"
                 Clicked="OnSaveClicked" />       

@@ -2,7 +2,7 @@
 using Firebase.Auth.Providers;
 using Microsoft.Extensions.Logging;
 
-using PPApp.Service;  
+using PPApp.Services;
 using PPApp.View;      
 
 namespace PPApp;
@@ -26,9 +26,11 @@ public static class MauiProgram
 #endif
 
         builder.Services.AddSingleton<IFirebaseAuthService, FirebaseAuthService>();
+        builder.Services.AddSingleton<FirebaseUserDatabaseService>();
 
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<RegisterPage>();
+        builder.Services.AddTransient<AllRecipesPage>();
         builder.Services.AddTransient<SearchPage>();
         builder.Services.AddTransient<ProfilePage>();
 

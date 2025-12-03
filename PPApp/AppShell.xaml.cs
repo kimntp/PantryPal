@@ -1,11 +1,11 @@
-﻿using PPApp.Service;
+﻿using PPApp.Services;
 
 namespace PPApp;
 
 public partial class AppShell : Shell
 {
     private readonly IFirebaseAuthService _auth;
-
+    private IFirebaseAuthService auth;
 
     public AppShell(IFirebaseAuthService auth)
     {
@@ -14,9 +14,8 @@ public partial class AppShell : Shell
 
         Routing.RegisterRoute(nameof(View.AllRecipesPage), typeof(View.AllRecipesPage));
         Routing.RegisterRoute(nameof(View.SearchPage), typeof(View.SearchPage));
-        Routing.RegisterRoute(nameof(View.RegisterPage), typeof(View.RegisterPage));
-        Routing.RegisterRoute(nameof(View.LoginPage), typeof(View.LoginPage));
         Routing.RegisterRoute(nameof(View.ProfilePage), typeof(View.ProfilePage));
+        Routing.RegisterRoute(nameof(View.RatingsFeedPage), typeof(View.RatingsFeedPage));
 
         // Check auth state and navigate to Login if needed
         Dispatcher.Dispatch(async () =>
@@ -32,26 +31,6 @@ public partial class AppShell : Shell
             }
             catch { }
         });
-
-       // UpdateFlyoutItems();
     }
 
- /*    private async void UpdateFlyoutItems()
-    {
-        var user = await _auth.GetCurrentUser();
-
-		if (user != null)
-		{
-			profileItem.IsVisible = true;
-			loginItem.IsVisible = false;
-			registerItem.IsVisible = false;
-		}
-		else
-		{
-			profileItem.IsVisible = false;
-			loginItem.IsVisible = true;
-			registerItem.IsVisible = true;
-		}
-        
-    } */
 }

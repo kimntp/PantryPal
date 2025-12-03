@@ -1,5 +1,5 @@
-using PPApp.Service;
 using PPApp.Model;
+using PPApp.Services;
 namespace PPApp.View;
 
 public partial class LoginPage : ContentPage
@@ -22,11 +22,15 @@ public partial class LoginPage : ContentPage
             return;
         }
 
-        await Shell.Current.GoToAsync(nameof(AllRecipesPage));
+        await Navigation.PopModalAsync();
     }
 
     private async void OnRegisterClicked(object sender, EventArgs e)
     {
-        await Navigation.PushAsync(new RegisterPage(_auth));
+        await Navigation.PushModalAsync(new RegisterPage(_auth));
+    }
+    private async void OnCancelClicked(object sender, EventArgs e)
+    {
+        await Navigation.PopModalAsync();
     }
 }

@@ -1,24 +1,69 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:Model="clr-namespace:PPApp.Model"
              x:Class="PPApp.View.ProfilePage"
              Title="Profile">
 
-<VerticalStackLayout Padding="20" Spacing="10">
-    <Label Text="User Profile" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" />
-    <Label x:Name="displayNameLabel" Text="Name: -" />
-    <Label x:Name="emailLabel" Text="Email: -" />
-    <Button x:Name="btnSignOut" Text="Sign Out" Clicked="OnSignOutClicked" />
+    <ScrollView>
+    <VerticalStackLayout Padding="20" Spacing="10">
+        <!-- Profile Info -->
+        <Image Source="profile.png" 
+               HeightRequest="100" 
+               WidthRequest="100" 
+               HorizontalOptions="Center" />
+        <Label x:Name="displayNameLabel" Text="Name: -" />
+        <Label x:Name="emailLabel" Text="Email: -" />
+        <Button x:Name="btnSignOut" Text="Sign Out" Clicked="OnSignOutClicked" BackgroundColor="Red"/>
 
-    <ListView x:Name="listRecipes" BackgroundColor="Transparent">
-        <ListView.ItemTemplate>
-            <DataTemplate x:DataType="Model:Recipe">
-                <TextCell Text="{Binding name}" />
-            </DataTemplate>
-        </ListView.ItemTemplate>
-    </ListView>
-</VerticalStackLayout>
+        <!-- Toggle Buttons -->
+        <HorizontalStackLayout Spacing="10">
+            <Button x:Name="btnShowRatings" Text="Show Ratings" Clicked="OnShowRatingsClicked" BackgroundColor="#FFB893B8" />
+            <Button x:Name="btnShowRecipes" Text="Show Saved Recipes" Clicked="OnShowRecipesClicked" BackgroundColor="#FFB893B8" />
+        </HorizontalStackLayout>
 
+        <!-- Private Ratings -->
+        <Label x:Name="lblRatingsHeader" Text="My Private Ratings" FontAttributes="Bold" FontSize="16" Margin="0,20,0,10" />
+        <CollectionView x:Name="listRatings"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <VerticalStackLayout Padding="15" Spacing="8" Margin="0,0,0,20"
+                                         BackgroundColor="White">
 
+                        <Button Text="{Binding UserName}"
+                                BackgroundColor="Transparent"
+                                FontSize="16" FontAttributes="Bold" />
+
+                        <Label Text="{Binding RecipeName}"
+                               FontSize="14" TextColor="#444" />
+
+                        <Label Text="{Binding StarsDisplay}"
+                               FontSize="20"
+                               TextColor="#f5a623" />
+
+                        <Label Text="{Binding Review}"
+                               FontSize="14"
+                               TextColor="#222" />
+
+                        <Label Text="{Binding Date, StringFormat='{0:MMM dd, yyyy}'}"
+                               FontSize="12"
+                               TextColor="#777" />
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Saved Recipes -->
+        <Label x:Name="lblRecipesHeader" Text="My Saved Recipes" FontAttributes="Bold" FontSize="16" Margin="0,20,0,10" IsVisible="False" />
+        <ListView x:Name="listRecipes" 
+                  BackgroundColor="Transparent"
+                  ItemTapped="OnRecipe_Tapped"
+                  IsVisible="False">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding Name}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

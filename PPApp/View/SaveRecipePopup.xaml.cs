@@ -1,7 +1,8 @@
 using System;
 using PPApp.Model;
-using PPApp.Service;
+using PPApp.Services;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.ApplicationModel;
 
 namespace PPApp.View
 {
@@ -17,15 +18,14 @@ namespace PPApp.View
             _recipe = recipe;
             _authService = auth;
             _userDb = new FirebaseUserDatabaseService();
-
             LoadRecipe();
         }
 
         private void LoadRecipe()
         {
-            recipeNameLabel.Text = _recipe.name;
-            ingredientsLabel.Text = string.Join(", ", _recipe.ingredients ?? new List<string>());
-            urlLabel.Text = _recipe.url;
+            recipeNameLabel.Text = _recipe.Name;
+            ingredientsLabel.Text = string.Join(", ", _recipe.Ingredients ?? new List<string>());
+            urlButton.Text = _recipe.Url;
         }
 
 
@@ -41,13 +41,30 @@ namespace PPApp.View
 
             await _userDb.SaveRecipeAsync(user.Uid, _recipe);
 
-            await DisplayAlert("Saved", $"{_recipe.name} has been saved!", "OK");
+            await DisplayAlert("Saved", $"{_recipe.Name} has been saved!", "OK");
             await Navigation.PopModalAsync();
         }
+        private async void OnUrlClicked(object sender, EventArgs e)
+{
+    if (!string.IsNullOrEmpty(_recipe.Url))
+    {
+        try
+        {
+            await Launcher.OpenAsync(_recipe.Url);
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Unable to open URL: {ex.Message}", "OK");
+        }
+    }
+}
 
         private async void OnCloseClicked(object sender, EventArgs e)
         {
             await Navigation.PopModalAsync();
         }
+
+
+
     }
 }
