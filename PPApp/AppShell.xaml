@@ -9,9 +9,10 @@
 
     Title="PPApp">
 
-    <FlyoutItem Title="Home" FlyoutDisplayOptions="AsMultipleItems">
-        <ShellContent Title="All Recipes" ContentTemplate="{DataTemplate View:AllRecipesPage}" Route="AllRecipesPage" />
-    </FlyoutItem>
+       <ShellContent
+        Title="Home"
+        ContentTemplate="{DataTemplate View:AllRecipesPage}" />
+
     <FlyoutItem Title="Search" FlyoutDisplayOptions="AsMultipleItems">
         <ShellContent Title="Search" Route="SearchPage" ContentTemplate="{DataTemplate View:SearchPage}" />
     </FlyoutItem>
@@ -23,6 +24,9 @@
     </FlyoutItem>
     <FlyoutItem x:Name="profileItem" Title="My Profile" FlyoutDisplayOptions="AsMultipleItems">
         <ShellContent Title="Profile" Route="ProfilePage" ContentTemplate="{DataTemplate View:ProfilePage}" />
+    </FlyoutItem>
+    <FlyoutItem x:Name="ratingsFeedItem" Title="Ratings Feed" FlyoutDisplayOptions="AsMultipleItems">
+        <ShellContent Title="Ratings Feed" Route="RatingsFeedPage" ContentTemplate="{DataTemplate View:RatingsFeedPage}" />
     </FlyoutItem>
 
         

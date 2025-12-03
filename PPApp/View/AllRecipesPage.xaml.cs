@@ -1,50 +1,61 @@
-using System;
 using PPApp.Model;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Storage;
-using System.Text.Json;
+using PPApp.Service;
 
 namespace PPApp.View;
 
 public partial class AllRecipesPage : ContentPage
 {
-    private AppUser? _user;
+    private readonly FirebaseUserDatabaseService _indexService;
+    private readonly IFirebaseAuthService _auth;
+    private List<Recipe> _allRecipes = new List<Recipe>();
 
-    public AllRecipesPage()
+    public AllRecipesPage(IFirebaseAuthService auth, FirebaseUserDatabaseService indexService)
     {
         InitializeComponent();
-        _user = null;
+        _auth = auth;
+        _indexService = indexService;
+    }
 
-        // attempt to restore cached user
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await LoadRecipesAsync();
+    }
+
+    private async Task LoadRecipesAsync()
+    {
         try
         {
-            var json = SecureStorage.GetAsync("user_json").GetAwaiter().GetResult();
-            if (!string.IsNullOrEmpty(json))
+            var recipeList = await _indexService.GetAllRecipes();
+
+            if (recipeList == null || recipeList.Count == 0)
             {
-                _user = JsonSerializer.Deserialize<AppUser>(json);
+                await DisplayAlert("Info", "No recipes found.", "OK");
+                return;
             }
+
+            int index = 0;
+            foreach (var item in recipeList)
+            {
+                if (string.IsNullOrEmpty(item.RecipeID))
+                    item.RecipeID = index.ToString();
+                index++;
+            }
+
+            _allRecipes = recipeList.ToList();
+            listRecipes.ItemsSource = _allRecipes;
         }
-        catch { }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Failed to load recipes: {ex.Message}", "OK");
+        }
     }
-
-    public AllRecipesPage(AppUser user)
-    {
-        InitializeComponent();
-        _user = user;
-    }
-
-    private void BtnSearch_Clicked(object sender, EventArgs e)
-    {
-        Shell.Current.GoToAsync(nameof(SearchPage));
-    }
-
-    private async void BtnRegister_Clicked(object sender, EventArgs e)
-    {
-        await Navigation.PushAsync(new RegisterPage(new Service.FirebaseAuthService()));
-    }
-
-    private async void BtnLogin_Clicked(object sender, EventArgs e)
-    {
-        await Navigation.PushAsync(new LoginPage(new Service.FirebaseAuthService()));
-    }
+    private async void OnRecipe_Tapped(object sender, ItemTappedEventArgs e) 
+    { 
+        if (e.Item is Recipe recipe) 
+        { 
+            await Navigation.PushModalAsync(new SaveRecipePopup(recipe, _auth)); 
+            listRecipes.SelectedItem = null; 
+        }
+}
 }

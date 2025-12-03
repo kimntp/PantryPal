@@ -1,13 +1,30 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:Model="clr-namespace:PPApp.Model"
              x:Class="PPApp.View.AllRecipesPage"
-                Title="Pantry Pal">
+             Title="Pantry Pal">
 
-    <VerticalStackLayout Spacing="5">
-        <Image Source="pplogo.png"/>
-        <!-- <Button x:Name="btnRegister" Clicked="BtnRegister_Clicked" Text="Register New User"> </Button>
-        <Button x:Name="btnLogin" Clicked="BtnLogin_Clicked" Text="Login"> </Button> -->
-    </VerticalStackLayout>
+    <Grid>
+        <!-- Background image that fills the page -->
+        <Image Source="pplogo.png"
+               Aspect="AspectFill"
+               Opacity="0.1"
+               InputTransparent="True"
+               VerticalOptions="FillAndExpand"
+               HorizontalOptions="FillAndExpand" />
 
+        <!-- Main content on top -->
+        <VerticalStackLayout Padding="10" Spacing="10">
+            <ListView x:Name="listRecipes"
+                      BackgroundColor="Transparent"
+                      ItemTapped="OnRecipe_Tapped"
+                      HasUnevenRows="True">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="Model:Recipe">
+                        <TextCell Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </VerticalStackLayout>
+    </Grid>
 </ContentPage>

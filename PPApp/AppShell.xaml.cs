@@ -17,6 +17,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(View.RegisterPage), typeof(View.RegisterPage));
         Routing.RegisterRoute(nameof(View.LoginPage), typeof(View.LoginPage));
         Routing.RegisterRoute(nameof(View.ProfilePage), typeof(View.ProfilePage));
+        Routing.RegisterRoute(nameof(View.RatingsFeedPage), typeof(View.RatingsFeedPage));
 
         // Check auth state and navigate to Login if needed
         Dispatcher.Dispatch(async () =>
