@@ -5,8 +5,7 @@
     <VerticalStackLayout Padding="20" Spacing="10">
 
         <Label x:Name="displayNameLabel" FontAttributes="Bold" FontSize="20"/>
-        <Button x:Name="followButton" Clicked="OnFollowButtonClicked"/>
-        <Button Text="Cancel" Clicked="OnCancelClicked"/>
+        <Button Text="Back" Clicked="OnCancelClicked"/>
 
         <Label Text="Public Ratings" FontAttributes="Bold" FontSize="16" Margin="0,20,0,10"/>
         <CollectionView x:Name="ratingsCollectionView" SelectionMode="None">

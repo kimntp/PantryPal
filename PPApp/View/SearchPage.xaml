@@ -37,7 +37,7 @@
                    FontAttributes="Bold"
                    VerticalOptions="Center" />
 
-            <Label Text="OR"
+            <Label Text="ANY"
                    FontSize="13"
                    VerticalOptions="Center" />
 
@@ -45,7 +45,7 @@
                     Toggled="OnMatchModeToggled"
                     VerticalOptions="Center" />
 
-            <Label Text="AND"
+            <Label Text="ALL"
                    FontSize="13"
                    VerticalOptions="Center" />
         </HorizontalStackLayout>
@@ -90,8 +90,9 @@
 
                             <!-- Dietary chips -->
                             <HorizontalStackLayout Grid.Row="2"
-                                                   Spacing="4"
-                                                   Margin="6,0,6,8">
+                                                   Spacing="8"
+                                                   Margin="6,0,6,8"
+                                                   VerticalOptions="Center">
 
                                 <!-- Gluten chip -->
                                 <Border IsVisible="{Binding ContainsGluten}"
@@ -118,6 +119,12 @@
                                     <Label Text="Vegetarian"
                                            FontSize="10" />
                                 </Border>
+                        <BoxView HorizontalOptions="FillAndExpand" />
+
+                            <!-- Save Recipe button -->
+                            <Button Text="Save Recipe"
+                            Clicked="OnSaveRecipeClicked"
+                            HorizontalOptions="End" />
                             </HorizontalStackLayout>
                         </Grid>
                     </Border>

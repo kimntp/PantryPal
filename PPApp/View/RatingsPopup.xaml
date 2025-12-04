@@ -17,7 +17,6 @@
                HorizontalOptions="Center"
                FontAttributes="Bold" />
 
-        <!-- 5-star selection -->
         <HorizontalStackLayout x:Name="starLayout"
                                Spacing="6"
                                HorizontalOptions="Center">
@@ -28,7 +27,6 @@
             <Button Text="☆" FontSize="20" Clicked="OnStarClicked"/>
         </HorizontalStackLayout>
 
-        <!-- PUBLIC/PRIVATE TOGGLE -->
         <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
             <ImageButton x:Name="toggleIcon"
                         BorderColor="Gray"

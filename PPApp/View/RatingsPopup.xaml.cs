@@ -1,6 +1,5 @@
 using PPApp.Model;
 using PPApp.Services;
-using Firebase.Auth;
 
 namespace PPApp.View;
 

@@ -5,10 +5,10 @@
 
     <ScrollView>
     <VerticalStackLayout Padding="20" Spacing="10">
-        <!-- Profile Info -->
+    
         <Image Source="profile.png" 
-               HeightRequest="100" 
-               WidthRequest="100" 
+               HeightRequest="150" 
+               WidthRequest="150" 
                HorizontalOptions="Center" />
         <Label x:Name="displayNameLabel" Text="Name: -" />
         <Label x:Name="emailLabel" Text="Email: -" />
@@ -20,7 +20,7 @@
             <Button x:Name="btnShowRecipes" Text="Show Saved Recipes" Clicked="OnShowRecipesClicked" BackgroundColor="#FFB893B8" />
         </HorizontalStackLayout>
 
-        <!-- Private Ratings -->
+    
         <Label x:Name="lblRatingsHeader" Text="My Private Ratings" FontAttributes="Bold" FontSize="16" Margin="0,20,0,10" />
         <CollectionView x:Name="listRatings"
                         SelectionMode="None">
@@ -52,11 +52,10 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <!-- Saved Recipes -->
         <Label x:Name="lblRecipesHeader" Text="My Saved Recipes" FontAttributes="Bold" FontSize="16" Margin="0,20,0,10" IsVisible="False" />
         <ListView x:Name="listRecipes" 
                   BackgroundColor="Transparent"
-                  ItemTapped="OnRecipe_Tapped"
+                  ItemTapped="OnRecipeSelected"
                   IsVisible="False">
             <ListView.ItemTemplate>
                 <DataTemplate>

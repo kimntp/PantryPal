@@ -1,5 +1,4 @@
-using System;
-using Microsoft.Maui.Controls;
+using PPApp.Services;
 using PPApp.Model;
 
 namespace PPApp.View
@@ -10,6 +9,7 @@ namespace PPApp.View
         {
             InitializeComponent();
             BindingContext = recipe;
+
         }
 
         private async void OnCloseClicked(object sender, EventArgs e)
@@ -32,5 +32,6 @@ namespace PPApp.View
                 }
             }
         }
+        
     }
 }

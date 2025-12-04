@@ -10,23 +10,19 @@
         <VerticalStackLayout Padding="16"
                              Spacing="12">
 
-            <!-- Image -->
             <Image Source="{Binding DisplayImage}"
                    HeightRequest="220"
                    Aspect="AspectFill"
                    Margin="0,0,0,8" />
 
-            <!-- Name (Title-cased) -->
             <Label Text="{Binding DisplayName}"
                    FontSize="22"
                    FontAttributes="Bold"
                    LineBreakMode="WordWrap" />
 
-            <!-- Dietary chips -->
             <HorizontalStackLayout Spacing="4"
                                    Margin="0,0,0,4">
 
-                <!-- Gluten chip -->
                 <Border IsVisible="{Binding ContainsGluten}"
                         BackgroundColor="#FFE0B2"
                         Stroke="#FFB74D"
@@ -39,7 +35,6 @@
                            FontSize="11" />
                 </Border>
 
-                <!-- Vegetarian chip -->
                 <Border IsVisible="{Binding IsVegetarian}"
                         BackgroundColor="#C8E6C9"
                         Stroke="#81C784"
@@ -53,7 +48,6 @@
                 </Border>
             </HorizontalStackLayout>
 
-            <!-- URL (tap to open) -->
             <Label Text="{Binding Url}"
                    FontSize="12"
                    TextColor="Blue"
@@ -63,13 +57,11 @@
                 </Label.GestureRecognizers>
             </Label>
 
-            <!-- Ingredients header -->
             <Label Text="Ingredients:"
                    FontSize="16"
                    FontAttributes="Bold"
                    Margin="0,8,0,0" />
 
-            <!-- Ingredients list: use CleanIngredients -->
             <CollectionView ItemsSource="{Binding CleanIngredients}"
                             SelectionMode="None">
                 <CollectionView.ItemTemplate>

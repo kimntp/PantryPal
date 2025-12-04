@@ -1,8 +1,7 @@
-using System;
+
 using PPApp.Model;
 using PPApp.Services;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.ApplicationModel;
+
 
 namespace PPApp.View
 {
@@ -59,10 +58,23 @@ namespace PPApp.View
     }
 }
 
-        private async void OnCloseClicked(object sender, EventArgs e)
-        {
+private async void OnCloseClicked(object sender, EventArgs e)
+{
+    try
+    {
+        // Pop top modal (SaveRecipePopup)
+        if (Navigation.ModalStack.Count > 0)
             await Navigation.PopModalAsync();
-        }
+
+        // Pop underlying modal (RecipeDetailPage)
+        if (Navigation.ModalStack.Count > 0)
+            await Navigation.PopModalAsync();
+    }
+    catch (Exception ex)
+    {
+        System.Diagnostics.Debug.WriteLine($"Failed to pop both modals: {ex}");
+    }
+}
 
 
 

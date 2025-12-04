@@ -10,8 +10,8 @@
                HorizontalOptions="Center" />
 
         <Image Source="pplogo.png"
-               HeightRequest="150"
-               WidthRequest="190"
+               HeightRequest="250"
+               WidthRequest="250"
                HorizontalOptions="Center" />
 
         <Button Text="Login"

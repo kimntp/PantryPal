@@ -9,7 +9,6 @@ public partial class RatingsFeedPage : ContentPage
     private readonly IFirebaseAuthService _auth;
     private readonly FirebaseUserDatabaseService _userDb;
 
-    // Use ObservableCollection so CollectionView updates automatically
     public ObservableCollection<RecipeRating> PublicRatings { get; set; } = new();
 
     public RatingsFeedPage(IFirebaseAuthService auth, FirebaseUserDatabaseService userDb)

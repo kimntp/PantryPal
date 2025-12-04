@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+
 using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Maui.Controls;
-using PPApp.Controls;
+
 using PPApp.Model;
 using PPApp.Services;
 
@@ -14,9 +9,9 @@ namespace PPApp.View
     public partial class SearchPage : ContentPage
     {
         private readonly FirebaseUserDatabaseService _dataService = new();
+        private readonly IFirebaseAuthService _auth = new FirebaseAuthService();
         private List<Recipe> _allRecipes = new();
 
-        // false = OR (default), true = AND
         private bool _useAndMatch = false;
 
         public SearchPage()
@@ -45,7 +40,6 @@ namespace PPApp.View
                 RecipesCollectionView.ItemsSource = _allRecipes;
                 RecipesCollectionView.SelectionChanged += OnRecipeSelected;
 
-                // 2) Ingredient metadata from ingredients.json
                 await LoadIngredientsFromJsonAsync();
             }
             catch (Exception ex)
@@ -67,7 +61,6 @@ namespace PPApp.View
                     JsonSerializer.Deserialize<List<IngredientMeta>>(json)
                     ?? new List<IngredientMeta>();
 
-                // Merge duplicates by ingredient name (case-insensitive)
                 var grouped = ingredientMetas
                     .Where(m => !string.IsNullOrWhiteSpace(m.Ingredient))
                     .GroupBy(m => m.Ingredient, StringComparer.OrdinalIgnoreCase);
@@ -82,7 +75,6 @@ namespace PPApp.View
                     },
                     StringComparer.OrdinalIgnoreCase);
 
-                // Names list for the ComboBox
                 var ingredientNames = metaDict.Keys
                     .OrderBy(name => name)
                     .ToList();
@@ -90,7 +82,6 @@ namespace PPApp.View
                 IngredientCombo.ItemsSource = ingredientNames;
                 IngredientCombo.SetIngredientMetadata(metaDict);
 
-                // --- Classify each recipe + build cleaned ingredient list ---
                 foreach (var recipe in _allRecipes)
                 {
                     var ingredients = recipe.Ingredients ?? new List<string>();
@@ -109,7 +100,6 @@ namespace PPApp.View
                         }
                         else
                         {
-                            // Unknown ingredient, just keep the original
                             cleanList.Add(ing);
                         }
                     }
@@ -124,10 +114,6 @@ namespace PPApp.View
                 await DisplayAlert("Ingredient Error", ex.ToString(), "OK");
             }
         }
-
-        // -----------------------------
-        // Filtering logic
-        // -----------------------------
 
         private void IngredientCombo_SelectedItemChanged(object sender, EventArgs e)
         {
@@ -149,7 +135,6 @@ namespace PPApp.View
 
                 if (selected.Count == 0)
                 {
-                    // No filters → show all recipes
                     RecipesCollectionView.ItemsSource = _allRecipes;
                     return;
                 }
@@ -160,7 +145,6 @@ namespace PPApp.View
 
                 if (_useAndMatch)
                 {
-                    // AND mode: recipe must contain ALL selected ingredients
                     filtered = _allRecipes.Where(r =>
                     {
                         var ingredients = r.Ingredients ?? new List<string>();
@@ -170,7 +154,6 @@ namespace PPApp.View
                 }
                 else
                 {
-                    // OR mode: recipe must contain at least ONE selected ingredient
                     filtered = _allRecipes.Where(r =>
                         (r.Ingredients ?? new List<string>())
                             .Any(ing => selectedSet.Contains(ing)));
@@ -184,10 +167,20 @@ namespace PPApp.View
                 RecipesCollectionView.ItemsSource = _allRecipes;
             }
         }
-
-        // -----------------------------
-        // Recipe selection → detail popup
-        // -----------------------------
+        private async void OnSaveRecipeClicked(object sender, EventArgs e)
+    {
+        try
+        {
+            if (sender is VisualElement ve && ve.BindingContext is Recipe recipe)
+            {
+                await Navigation.PushModalAsync(new SaveRecipePopup(recipe, _auth));
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"OnRecipe_Tapped error: {ex}");
+        }
+    }
 
         private async void OnRecipeSelected(object sender, SelectionChangedEventArgs e)
         {

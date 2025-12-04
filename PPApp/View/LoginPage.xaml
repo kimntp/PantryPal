@@ -19,11 +19,7 @@
 
         <Button Text="Login"
                 Clicked="OnLoginClicked" />
-
-        <Button Text="Create Account"
-                Clicked="OnRegisterClicked"
-                BackgroundColor="Transparent"
-                TextColor="Blue" />
+                
               <Button Text="Cancel"
                 Clicked="OnCancelClicked"
                 BackgroundColor="Transparent"

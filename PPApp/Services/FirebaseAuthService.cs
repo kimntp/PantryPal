@@ -123,6 +123,7 @@ namespace PPApp.Services
         public Task SignOut()
         {
             _client?.SignOut();
+
             SecureStorage.Remove("auth_token");
             SecureStorage.Remove("user_json");
             return Task.CompletedTask;

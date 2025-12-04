@@ -25,11 +25,6 @@ public partial class LoginPage : ContentPage
 
         await Navigation.PopModalAsync();
     }
-
-    private async void OnRegisterClicked(object sender, EventArgs e)
-    {
-        await Navigation.PushModalAsync(new RegisterPage(_auth));
-    }
     private async void OnCancelClicked(object sender, EventArgs e)
     {
         await Navigation.PopModalAsync();

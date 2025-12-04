@@ -6,19 +6,18 @@ namespace PPApp.View;
 
 public partial class AllRecipesPage : ContentPage
 {
-    private readonly FirebaseUserDatabaseService _indexService;
+    private readonly FirebaseUserDatabaseService _db;
     private readonly IFirebaseAuthService _auth;
 
-    // Use ObservableCollection for automatic UI updates
+
     public ObservableCollection<Recipe> Recipes { get; set; } = new();
 
-    public AllRecipesPage(IFirebaseAuthService auth, FirebaseUserDatabaseService indexService)
+    public AllRecipesPage(IFirebaseAuthService auth, FirebaseUserDatabaseService db)
     {
         InitializeComponent();
         _auth = auth;
-        _indexService = indexService;
+        _db = db;
 
-        // Bind the CollectionView to the ObservableCollection
         listRecipes.ItemsSource = Recipes;
     }
 
@@ -32,7 +31,7 @@ public partial class AllRecipesPage : ContentPage
     {
         try
         {
-            var recipeList = await _indexService.GetAllRecipes();
+            var recipeList = await _db.GetAllRecipes();
 
             if (recipeList == null || !recipeList.Any())
             {
@@ -40,10 +39,8 @@ public partial class AllRecipesPage : ContentPage
                 return;
             }
 
-            // Clear previous items
             Recipes.Clear();
 
-            // Assign IDs if missing and add to ObservableCollection
             for (int i = 0; i < recipeList.Count; i++)
             {
                 if (string.IsNullOrEmpty(recipeList[i].RecipeID))
