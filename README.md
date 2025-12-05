@@ -13,7 +13,7 @@ Setup instructions can be found in the official MAUI documentation [here](https:
 Install the Android iOS Emulator extension in Visual Studio Code.
 Start your Android emulator before building the project.
 
-### 3. Build and Laucnch the App
+### 3. Build and Launch the App
 From the project directory, run:
 `dotnet build -t:Run -f net9.0-android`
 
